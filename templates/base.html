@@ -10,6 +10,11 @@
 <body>
 
 	<div id="app">
+		{% if user.is_authenticated %}
+			<p>{{user.username}} online</p>
+		{% else %}
+			<p>Offline</p>
+		{% endif %}
         <demo></demo>
         {% block content %}
         {% endblock %}
