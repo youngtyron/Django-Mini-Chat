@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from dj	ango.conf.urls import url
 
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
