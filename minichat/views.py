@@ -25,8 +25,37 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
+from django.contrib.auth.models import User
+
+from .forms import RegistrationForm
+
 UserModel = get_user_model()
 
+class RegistrationView(FormView):
+
+    template_name = 'registration.html'
+    form_class = RegistrationForm
+    success_url = '/'
+        
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            redirect_to = self.get_success_url()
+            return HttpResponseRedirect(redirect_to)
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        username = form.cleaned_data['username']
+        first_name = form.cleaned_data['first_name']
+        last_name = form.cleaned_data['last_name']
+        email = form.cleaned_data['email']
+        password = form.cleaned_data['password']
+        user = User.objects.create_user(username = username, 
+                                        email = email, 
+                                        password = password, 
+                                        first_name = first_name, 
+                                        last_name = last_name)
+        auth_login(self.request, user)
+        return super(RegistrationView, self).form_valid(form)
 
 class SuccessURLAllowedHostsMixin:
     success_url_allowed_hosts = set()
@@ -42,7 +71,7 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
     form_class = AuthenticationForm
     authentication_form = None
     redirect_field_name = REDIRECT_FIELD_NAME
-    template_name = 'login.html'
+    template_name = 'index.html'
     redirect_authenticated_user = False
     extra_context = None
 
@@ -204,14 +233,14 @@ class PasswordContextMixin:
 
 
 class PasswordResetView(PasswordContextMixin, FormView):
-    email_template_name = 'registration/password_reset_email.html'
+    email_template_name = 'password_reset_email.html'
     extra_email_context = None
     form_class = PasswordResetForm
     from_email = None
     html_email_template_name = None
     subject_template_name = 'registration/password_reset_subject.txt'
     success_url = reverse_lazy('password_reset_done')
-    template_name = 'registration/password_reset_form.html'
+    template_name = 'password_reset_form.html'
     title = _('Password reset')
     token_generator = default_token_generator
 
@@ -239,7 +268,7 @@ INTERNAL_RESET_SESSION_TOKEN = '_password_reset_token'
 
 
 class PasswordResetDoneView(PasswordContextMixin, TemplateView):
-    template_name = 'registration/password_reset_done.html'
+    template_name = 'password_reset_done.html'
     title = _('Password reset sent')
 
 
@@ -248,7 +277,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     post_reset_login = False
     post_reset_login_backend = None
     success_url = reverse_lazy('password_reset_complete')
-    template_name = 'registration/password_reset_confirm.html'
+    template_name = 'password_reset_confirm.html'
     title = _('Enter new password')
     token_generator = default_token_generator
 
@@ -316,7 +345,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
 
 
 class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
-    template_name = 'registration/password_reset_complete.html'
+    template_name = 'password_reset_complete.html'
     title = _('Password reset complete')
 
     def get_context_data(self, **kwargs):
@@ -328,7 +357,7 @@ class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
 class PasswordChangeView(PasswordContextMixin, FormView):
     form_class = PasswordChangeForm
     success_url = reverse_lazy('password_change_done')
-    template_name = 'registration/password_change_form.html'
+    template_name = 'password_change_form.html'
     title = _('Password change')
 
     @method_decorator(sensitive_post_parameters())
@@ -351,7 +380,7 @@ class PasswordChangeView(PasswordContextMixin, FormView):
 
 
 class PasswordChangeDoneView(PasswordContextMixin, TemplateView):
-    template_name = 'registration/password_change_done.html'
+    template_name = 'password_change_done.html'
     title = _('Password change successful')
 
     @method_decorator(login_required)

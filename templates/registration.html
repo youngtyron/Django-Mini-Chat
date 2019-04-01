@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Register your account</h1>
+
+<div class="col-md-8 col-md-offset-2 text-center">
+	<form method="POST">
+		{% csrf_token %}
+		{% for field in form %}
+			<div class="form-group col-md-6">
+				{{ form.non_field_errors }}
+				{{ field.errors }}
+				{{ field.label_tag }}
+				{{ field }}
+			</div>
+		{% endfor %}
+		<p><input type="submit" class="btn btn-avocado" value="Register"><a href="{% url 'index' %}"> Back to home page</a></p>
+	</form>
+</div>
+
+
+{% endblock %}

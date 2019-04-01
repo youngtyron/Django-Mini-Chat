@@ -3,13 +3,11 @@ require('bootstrap-sass');
 import Vue from 'vue';
 
 import Demo from "./components/Demo.vue";
-import Info from "./components/Info.vue";
 
 
 const app = new Vue({
     el: '#app',
     components: {
         Demo,
-        Info
     }
 });
