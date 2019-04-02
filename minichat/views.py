@@ -24,19 +24,29 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-
+from django.views.generic.detail import DetailView
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 from .forms import RegistrationForm
 
 UserModel = get_user_model()
+
+
+class ProfileView(DetailView):
+    template_name = 'profile.html'
+
+    def get_object(self, *kwargs):
+        obj = get_object_or_404(User, username = self.kwargs['username'])
+        return obj
+
 
 class RegistrationView(FormView):
 
     template_name = 'registration.html'
     form_class = RegistrationForm
     success_url = '/'
-        
+
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
             redirect_to = self.get_success_url()
@@ -49,10 +59,10 @@ class RegistrationView(FormView):
         last_name = form.cleaned_data['last_name']
         email = form.cleaned_data['email']
         password = form.cleaned_data['password']
-        user = User.objects.create_user(username = username, 
-                                        email = email, 
-                                        password = password, 
-                                        first_name = first_name, 
+        user = User.objects.create_user(username = username,
+                                        email = email,
+                                        password = password,
+                                        first_name = first_name,
                                         last_name = last_name)
         auth_login(self.request, user)
         return super(RegistrationView, self).form_valid(form)

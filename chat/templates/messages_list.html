@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for member in room.all_members %}
+  <p>{{member.first_name}} {{member.last_name}}</p>
+{% endfor %}
+
+<messages :room_id="{{room.id}}"></messages>
+
+{% endblock %}

@@ -8,6 +8,12 @@ class Room(models.Model):
 	def __str__(self):
 		return str(self.id)
 
+	def all_members(self):
+		return self.member.all()
+
+	def all_messages(self):
+		return Message.objects.filter(room = self)
+
 class Message(models.Model):
 	author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messages')
 	room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='messages')
@@ -19,9 +25,22 @@ class Message(models.Model):
 	def __str__(self):
 		return self.author.username + ' at ' + str(self.date)
 
+	def message_pack(self):
+		images_pack = list()
+		images = self.image.all()
+		for image in images:
+			images_pack.append(image.image.url)
+		message_pack = {
+			'author':{'first_name':self.author.first_name, 'last_name':self.author.last_name, 'id': self.author.id},
+			'text': self.text,
+			'date': str(self.date),
+			'images': images_pack
+		}
+		return message_pack
+
 class MessageImage(models.Model):
 	room = models.ForeignKey(Room, on_delete=models.CASCADE)
 	image = models.ImageField(upload_to="message_images/", null = True, blank = True)
-		
+
 	def __str__(self):
 		return self.image.url

@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.urls import path, include
-# from django.views.generic import TemplateView
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -18,6 +17,8 @@ urlpatterns = [
     path('password_change/', views.PasswordChangeView.as_view(), name='password_change'),
     path('password_change/done/', views.PasswordChangeDoneView.as_view(), name='password_change_done'),
     path('registration/', views.RegistrationView.as_view(), name='registration'),
+    path('profile/<str:username>', views.ProfileView.as_view(), name='profile'),
+    path('chat/', include('chat.urls', namespace='chat')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

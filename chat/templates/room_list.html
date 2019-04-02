@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+	{% for room in room_list %}
+	  <a href="{% url 'chat:room' room.id %}">ROOM</a>
+		{% for member in room.all_members %}
+			<p>{{member.first_name}} {{member.last_name}}</p>
+		{% endfor %}
+	{% endfor %}
+
+{% endblock %}
