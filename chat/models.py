@@ -1,3 +1,4 @@
+import calendar
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -20,10 +21,17 @@ class Message(models.Model):
 	text = models.CharField(max_length=200, null=True, blank=True)
 	date = models.DateTimeField(auto_now_add=True)
 	had_read = models.ManyToManyField(User)
-	image = models.ManyToManyField('MessageImage')
+	image = models.ManyToManyField('MessageImage', blank=True)
 
 	def __str__(self):
 		return self.author.username + ' at ' + str(self.date)
+
+	def date_time_format(self):
+		return str(self.date.hour) + ':' + str(self.date.minute)
+
+	def date_date_format(self):
+		date = self.date
+		return str(self.date.day) + 'th ' + calendar.month_name[self.date.month]
 
 	def message_pack(self):
 		images_pack = list()
@@ -31,9 +39,10 @@ class Message(models.Model):
 		for image in images:
 			images_pack.append(image.image.url)
 		message_pack = {
-			'author':{'first_name':self.author.first_name, 'last_name':self.author.last_name, 'id': self.author.id},
+			'author':{'first_name':self.author.first_name, 'last_name':self.author.last_name, 'username': self.author.username},
 			'text': self.text,
-			'date': str(self.date),
+			'date': self.date_date_format(),
+			'time': self.date_time_format(),
 			'images': images_pack
 		}
 		return message_pack
