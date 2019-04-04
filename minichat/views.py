@@ -13,7 +13,7 @@ from django.contrib.auth.forms import (
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect, QueryDict
+from django.http import HttpResponseRedirect, QueryDict, HttpResponse
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -54,11 +54,15 @@ class RegistrationView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        print('-----------------')
         username = form.cleaned_data['username']
         first_name = form.cleaned_data['first_name']
         last_name = form.cleaned_data['last_name']
         email = form.cleaned_data['email']
-        password = form.cleaned_data['password']
+        password = form.cleaned_data['password1']
+        print(form.cleaned_data['password1'])
+        print(password)
+        print('------------------')
         user = User.objects.create_user(username = username,
                                         email = email,
                                         password = password,

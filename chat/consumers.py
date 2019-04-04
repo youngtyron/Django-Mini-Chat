@@ -1,5 +1,6 @@
 import json
 import asyncio
+from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
@@ -29,28 +30,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         text_message = text_data_json['message']
         user = self.scope["user"]
         await self.create_message(user, text_message)
-        print('receive')
-        await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'chat_message',
-                    'message': text_message
-                }
-            )
 
     @database_sync_to_async
     def create_message(self, user, text_message):
         room = Room.objects.get(id = self.room_id)
-        print('create')
         message = Message.objects.create(author = user,
                                room = room,
                                text = text_message
             )
         message.had_read.add(user)
         message.save()
+        async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'transmit_message',
+                    'message': message.message_pack()
+                }
+            )
 
-    async def chat_message(self, event):
-        print('to_chat')
+    async def transmit_message(self, event):
         message = event['message']
         await self.send(text_data=json.dumps({
             'message': message

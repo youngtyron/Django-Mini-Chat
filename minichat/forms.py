@@ -21,12 +21,12 @@ class RegistrationForm(forms.Form):
 	email = forms.EmailField(required=True,
 							 label='Email',
 							 widget=forms.TextInput(attrs = {'class':'form-control'}))
-	password = forms.CharField(label = 'Password',
+	password1 = forms.CharField(label = 'Password',
 							   max_length = 30,
 	                		   min_length = 6,
 	                		   required=True,
 	                		   widget = forms.PasswordInput(attrs = {'class':'form-control'}))
-	confirm = forms.CharField(label = 'Confirm password',
+	password2 = forms.CharField(label = 'Confirm password',
                     		  max_length = 30,
                       		  min_length = 6,
                       		  required=True,
@@ -41,8 +41,8 @@ class RegistrationForm(forms.Form):
 
 	def clean_password(self):
 		cleaned_data = super().clean()
-		password = cleaned_data.get('password')
-		confirm = cleaned_data.get('confirm')
-		if password and confirm:
-			if password != confirm:
+		password1 = cleaned_data.get('password1')
+		confirm = cleaned_data.get('password2')
+		if password1 and password2:
+			if password1 != password2:
 				raise ValidationError('Invalid password')

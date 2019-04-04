@@ -1,11 +1,20 @@
-ul.errorlist{
-	color: red;
-}
-
-.login_div{
-}
-
 .btn-avocado{
 	background-color: #226E17;
+	color: #FFFFFF;
+}
+.navbar-avocado{
+	background-color: #226E17;
+	color: #FFFFFF;
+}
+.navbar-a:link {
+	color: #FFFFFF;
+}
+.navbar-a:visited {
+	color: #FFFFFF;
+}
+.navbar-a:hover {
+	color: #FFFFFF;
+}
+.navbar-a:active {
 	color: #FFFFFF;
 }
