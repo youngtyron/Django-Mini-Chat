@@ -23,6 +23,9 @@ class Message(models.Model):
 	had_read = models.ManyToManyField(User)
 	image = models.ManyToManyField('MessageImage', blank=True)
 
+	class Meta:
+		ordering = ['-date']
+
 	def __str__(self):
 		return self.author.username + ' at ' + str(self.date)
 
