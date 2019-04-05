@@ -3,7 +3,7 @@
         <ul class="list-group">
         	<i class="far fa-arrow-alt-circle-up arrow-up-avocado fa-4x" @click="olderMessagesUpload" 
         														@mouseover="olderMessagesUpload"></i>
-	        <li class="list-group-item" v-for="message in messages">
+	        <li class="list-group-item"  v-bind:class="{not_read: message.not_read}" v-for="message in messages">
 	    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
 	    		<p>{{message.text}}</p>
 	    		<p>{{message.time}}</p>
@@ -31,11 +31,11 @@
             	text_input: '',
             	newMessageSocket: null,
             	portionMessagesSocket: null,
+            	readMessagesSocket: null,
             	counter: 0,
             }
         },
         mounted() {
-        	// this.loadMessages()
 		    this.portionMessagesSocket = new WebSocket(
 		        'ws://' + window.location.host +'/ws/chat/portion/' + this.room_id + '/');
 		  	this.portionMessagesSocket.addEventListener("message", e =>{
@@ -45,6 +45,12 @@
         		this.raw_messages = messages
         		this.messages = this.raw_messages.reverse().concat(this.messages)
         		this.counter = new_counter
+        		for (var i = 0; i < this.messages.length; i++) {
+        			if (this.messages[i].need_update){
+        				this.readMessages()
+        				break
+        			}
+        		}
 		  	});
 		    this.portionMessagesSocket.onclose = function(e) {
 		        console.error('Chat socket closed unexpectedly');
@@ -65,17 +71,25 @@
 		    this.newMessageSocket.onclose = function(e) {
 		        console.error('Chat socket closed unexpectedly');
 		    };
+		    this.readMessagesSocket = new WebSocket(
+		    	'ws://' + window.location.host + '/ws/chat/reading/' + this.room_id + '/');
+		    this.readMessagesSocket.onopen = function(e) {
+		        console.log('ReadMessagesSocket opened');
+		    };
+		    this.readMessagesSocket.onclose = function(e) {
+		        console.error('Chat socket closed unexpectedly');
+		    };
+		  	this.readMessagesSocket.addEventListener("message", e =>{
+		    	var data = JSON.parse(e.data);
+        		var updated = data['updated'];
+        		for (var i = 0; i < updated.length; i++) {
+        			this.whiteMessages(updated[i]);
+        		}
+		  	});
 			window.addEventListener('keypress', this.keyListener);
 
         },
         methods: {
-		 		// loadMessages: function(){
-		   //          axios.get('/chat/api/messages/'+this.room_id).then((response)=> {
-		   //          	this.raw_messages = response.data
-			  //           this.messages = this.raw_messages.reverse();
-			  //           this.raw_messages = []
-		   //          });
-		 		// },
 		 		sendMessage: function(e){
 		 			e.preventDefault()
 		 			var text_message = this.text_input
@@ -99,7 +113,21 @@
 		 			this.portionMessagesSocket.send(JSON.stringify({
 				        'counter': this.counter
 				    }));
+		 		},
+		 		readMessages: function(){
+		 			console.log('read this messages all')
+	 				this.readMessagesSocket.send(JSON.stringify({
+			            'counter': this.counter
+			        }));
+		 		},
+		 		whiteMessages: function(id){
+	 				for (var i = 0; i < this.messages.length; i++) {
+	 					if (this.messages[i].id == id){
+	 						this.messages[i].not_read = false
+	 					}
+	 				}
 		 		}
+
             }      
         };
 </script>

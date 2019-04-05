@@ -42,13 +42,50 @@ class Message(models.Model):
 		for image in images:
 			images_pack.append(image.image.url)
 		message_pack = {
+			'id': self.id,
 			'author':{'first_name':self.author.first_name, 'last_name':self.author.last_name, 'username': self.author.username},
 			'text': self.text,
 			'date': self.date_date_format(),
 			'time': self.date_time_format(),
-			'images': images_pack
+			'images': images_pack,
 		}
 		return message_pack
+
+	def has_not_user_read(self, user):
+		if user in self.had_read.all():
+			return False
+		else:
+			return True
+
+	def green_message_for_user(self, user):
+		if user == self.author:
+			if self.had_read.all().count() < 2:
+				return True
+			else:
+				return False
+		else:
+			return self.has_not_user_read(user)	
+
+	def white_message_for_user(self, user):
+		if user == self.author:
+			if self.had_read.all().count() < 2:
+				return False
+			else:
+				return True
+		else:
+			if self.has_not_user_read(user):
+				return False
+			else:
+				return True		
+
+	def need_read_and_update(self, user):
+		if user != self.author:
+			if self.green_message_for_user(user):
+				return True
+			else:
+				return False
+		else:
+			return False
 
 class MessageImage(models.Model):
 	room = models.ForeignKey(Room, on_delete=models.CASCADE)
