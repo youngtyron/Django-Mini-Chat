@@ -48,8 +48,25 @@ class Message(models.Model):
 			'date': self.date_date_format(),
 			'time': self.date_time_format(),
 			'images': images_pack,
+			'not_read': True
 		}
 		return message_pack
+
+	def packed_dict(self, user):
+		images_pack = list()
+		images = self.image.all()
+		for image in images:
+			images_pack.append(image.image.url)
+		packed_dict = {
+			'id': self.id,
+			'author':{'first_name':self.author.first_name, 'last_name':self.author.last_name, 'username': self.author.username},
+			'text': self.text,
+			'date': self.date_date_format(),
+			'time': self.date_time_format(),
+			'images': images_pack,
+			'not_read': self.green_message_for_user(user)
+		}
+		return packed_dict		
 
 	def has_not_user_read(self, user):
 		if user in self.had_read.all():

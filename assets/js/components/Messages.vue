@@ -29,62 +29,40 @@
             	messages: [],
             	raw_messages: [],
             	text_input: '',
-            	newMessageSocket: null,
-            	portionMessagesSocket: null,
-            	readMessagesSocket: null,
+            	commonRoomSocket: null,
             	counter: 0,
             }
         },
         mounted() {
-		    this.portionMessagesSocket = new WebSocket(
-		        'ws://' + window.location.host +'/ws/chat/portion/' + this.room_id + '/');
-		  	this.portionMessagesSocket.addEventListener("message", e =>{
-		    	var data = JSON.parse(e.data);
-        		var messages = data['messages']
-        		var new_counter = data['counter']
-        		this.raw_messages = messages
-        		this.messages = this.raw_messages.reverse().concat(this.messages)
-        		this.counter = new_counter
-        		for (var i = 0; i < this.messages.length; i++) {
-        			if (this.messages[i].need_update){
-        				this.readMessages()
-        				break
-        			}
-        		}
-		  	});
-		    this.portionMessagesSocket.onclose = function(e) {
-		        console.error('Chat socket closed unexpectedly');
-		    };
+        	this.commonRoomSocket = new WebSocket(
+		        'ws://' + window.location.host +'/ws/chat/common/' + this.room_id + '/');
 		    var counter = this.counter
-		    this.portionMessagesSocket.onopen = function(e) {
+		    this.commonRoomSocket.onopen = function(e) {
 			    this.send(JSON.stringify({
-			        'counter': counter
+			        'counter': counter,
+			        'command': 'get_messages'
 			    }));
 		    };
-		    this.newMessageSocket = new WebSocket(
-		        'ws://' + window.location.host +'/ws/chat/newmessages/' + this.room_id + '/');
-		  	this.newMessageSocket.addEventListener("message", e =>{
+		  	this.commonRoomSocket.addEventListener("message", e =>{
 		    	var data = JSON.parse(e.data);
-        		var message = data['message'];
-        		this.messages = this.messages.concat(message)
-		  	});
-		    this.newMessageSocket.onclose = function(e) {
-		        console.error('Chat socket closed unexpectedly');
-		    };
-		    this.readMessagesSocket = new WebSocket(
-		    	'ws://' + window.location.host + '/ws/chat/reading/' + this.room_id + '/');
-		    this.readMessagesSocket.onopen = function(e) {
-		        console.log('ReadMessagesSocket opened');
-		    };
-		    this.readMessagesSocket.onclose = function(e) {
-		        console.error('Chat socket closed unexpectedly');
-		    };
-		  	this.readMessagesSocket.addEventListener("message", e =>{
-		    	var data = JSON.parse(e.data);
-        		var updated = data['updated'];
-        		for (var i = 0; i < updated.length; i++) {
-        			this.whiteMessages(updated[i]);
-        		}
+		    	if (data['messages_portion']){
+	        		var messages = data['messages_portion']
+	        		var new_counter = data['counter']
+	        		this.raw_messages = messages
+	        		this.messages = this.raw_messages.reverse().concat(this.messages)
+	        		this.counter = new_counter
+	        		for (var i = 0; i < this.messages.length; i++) {
+	        			if (this.messages[i].need_update){
+	        				// this.readMessages()
+	        				break
+	        			}
+	        		}
+		    	}
+		    	else if (data['new_message']){
+			    	var message = data['new_message'];
+	        		this.messages = this.messages.concat(message)	
+		    	}
+
 		  	});
 			window.addEventListener('keypress', this.keyListener);
 
@@ -95,9 +73,10 @@
 		 			var text_message = this.text_input
 		 			text_message = text_message.trim()
 		 			if (text_message !=''){
-			 			this.newMessageSocket.send(JSON.stringify({
-				            'message': text_message
-				        }));
+					   	this.commonRoomSocket.send(JSON.stringify({
+					            'message': text_message,
+					            'command': 'create_message'
+					        }));
 		 			}
 			  		this.text_input=''
 		 		},
@@ -110,16 +89,17 @@
 		 			}
 		 		},
 		 		olderMessagesUpload: function(){
-		 			this.portionMessagesSocket.send(JSON.stringify({
-				        'counter': this.counter
+		 			this.commonRoomSocket.send(JSON.stringify({
+				        'counter': this.counter,
+				        'command': 'get_messages'
 				    }));
 		 		},
-		 		readMessages: function(){
-		 			console.log('read this messages all')
-	 				this.readMessagesSocket.send(JSON.stringify({
-			            'counter': this.counter
-			        }));
-		 		},
+		 		// readMessages: function(){
+		 		// 	console.log('read this messages all')
+	 			// 	this.readMessagesSocket.send(JSON.stringify({
+			  //           'counter': this.counter
+			  //       }));
+		 		// },
 		 		whiteMessages: function(id){
 	 				for (var i = 0; i < this.messages.length; i++) {
 	 					if (this.messages[i].id == id){

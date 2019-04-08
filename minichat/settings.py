@@ -89,6 +89,13 @@ CHANNEL_LAYERS = {
     },
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'chat_cache_table',
+    }
+}
+
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
