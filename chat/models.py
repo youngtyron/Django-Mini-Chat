@@ -48,7 +48,8 @@ class Message(models.Model):
 			'date': self.date_date_format(),
 			'time': self.date_time_format(),
 			'images': images_pack,
-			'not_read': True
+			'not_read': True,
+			'need_update': True
 		}
 		return message_pack
 
@@ -64,7 +65,8 @@ class Message(models.Model):
 			'date': self.date_date_format(),
 			'time': self.date_time_format(),
 			'images': images_pack,
-			'not_read': self.green_message_for_user(user)
+			'not_read': self.green_message_for_user(user),
+			'need_update': self.need_read_and_update(user)
 		}
 		return packed_dict		
 

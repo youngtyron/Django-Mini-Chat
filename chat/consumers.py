@@ -43,6 +43,9 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         elif data['command'] == 'get_messages':
             counter = data['counter']
             await self.get_messages_portion(counter)
+        elif data['command'] == 'read_messages_list':
+            counter = data['counter']
+            await self.read_messages_list(counter)
 
     @database_sync_to_async
     def create_message(self, text_message):
@@ -78,9 +81,6 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         for message in messages:
             this_pack = message.packed_dict(user)
             messages_pack.append(this_pack)
-        # cache_key = 'chat_%s_user_%s' % (self.room_id, user.id)
-        # channel_layer = get_channel_layer()
-        # my_channel_name = cache.get(cache_key)
         async_to_sync(self.channel_layer.send)(
             self.channel_name,
                 {
@@ -98,56 +98,46 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
             'counter': counter
         }))
 
+    @database_sync_to_async
+    def read_messages_list(self, counter):
+        room = Room.objects.get(id = self.room_id)
+        all_messages = room.all_messages()[: counter]
+        updating_messages = list()
+        user = self.scope["user"]
+        for m in all_messages:
+            if m.has_not_user_read(user):
+                updating_messages.append(m)
+        distribution_list = list()
+        for member in room.all_members():
+            if self.belong_to_distribution_list(updating_messages, member):
+                distribution_list.append(member)
+        for message in updating_messages:
+            message.had_read.add(user)
+            message.save()   
+        for addressee in distribution_list:
+            distributed_data = list()
+            for updating_message in updating_messages:
+                distributed_data.append({'id': updating_message.id, 'not_read': updating_message.green_message_for_user(addressee), 
+                                         'need_update': updating_message.need_read_and_update(addressee)})
+            cache_key = 'chat_%s_user_%s' % (self.room_id, addressee.id)
+            addressee_channel_name = cache.get(cache_key)
+            async_to_sync(self.channel_layer.send)(
+                addressee_channel_name,
+                    {
+                        'type': 'return_read_list',
+                        'updated_messages': distributed_data,
+                    }
+            )
 
-# class ReadMessagesConsumer(AsyncWebsocketConsumer):
+    def belong_to_distribution_list(self, messages, user):
+        for message in messages:
+            if message.green_message_for_user(user):
+                return True 
+        return False
 
-#     async def connect(self):
-#         self.room_id = self.scope['url_route']['kwargs']['room_id']
-#         self.room_group_name = 'reading_%s' % self.room_id
-#         await self.channel_layer.group_add(
-#             self.room_group_name,
-#             self.channel_name
-#         )
-#         await self.accept()
-
-
-#     async def disconnect(self, close_code):
-#          await self.channel_layer.group_discard(
-#             self.room_group_name,
-#             self.channel_name
-#         )
-
-#     async def receive(self, text_data):
-#         self.room_id = self.scope['url_route']['kwargs']['room_id']
-#         data_json = json.loads(text_data)
-#         counter = data_json['counter']  
-#         room = Room.objects.get(id = self.room_id)
-#         user = self.scope["user"]
-#         await self.read_this_messages(room, counter, user)      
-
-#     @database_sync_to_async
-#     def read_this_messages(self, room, counter, user):
-#         all_messages = room.all_messages()[: counter]
-#         updating_messages = list()
-#         for m in all_messages:
-#             if m.has_not_user_read(user):
-#                 updating_messages.append(m)
-#         updated_pack = list() 
-#         for message in updating_messages:
-#             message.had_read.add(user)
-#             message.save()   
-#             if (message.white_message_for_user(user)):
-#                 updated_pack.append(message.id)
-#         async_to_sync(self.channel_layer.group_send)(
-#                 self.room_group_name,
-#                 {
-#                     'type': 'return_updated',
-#                     'updated': updated_pack,
-#                 }
-#             )
-
-#     async def return_updated(self, event):
-#         updated = event['updated']
-#         await self.send(text_data=json.dumps({
-#             'updated': updated,
-#         }))
+    
+    async def return_read_list(self, event):
+        updated_messages = event['updated_messages']
+        await self.send(text_data=json.dumps({
+            'updated_messages': updated_messages
+        }))

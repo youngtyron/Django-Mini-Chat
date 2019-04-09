@@ -53,7 +53,7 @@
 	        		this.counter = new_counter
 	        		for (var i = 0; i < this.messages.length; i++) {
 	        			if (this.messages[i].need_update){
-	        				// this.readMessages()
+	        				this.readMessages();
 	        				break
 	        			}
 	        		}
@@ -61,6 +61,12 @@
 		    	else if (data['new_message']){
 			    	var message = data['new_message'];
 	        		this.messages = this.messages.concat(message)	
+		    	}
+		    	else if (data['updated_messages']){
+			    	var updated = data['updated_messages'];
+	        		for (var i = 0; i < updated.length; i++) {
+	        			this.updateMessage(updated[i]);
+	        		}
 		    	}
 
 		  	});
@@ -94,16 +100,17 @@
 				        'command': 'get_messages'
 				    }));
 		 		},
-		 		// readMessages: function(){
-		 		// 	console.log('read this messages all')
-	 			// 	this.readMessagesSocket.send(JSON.stringify({
-			  //           'counter': this.counter
-			  //       }));
-		 		// },
-		 		whiteMessages: function(id){
+		 		readMessages: function(){
+	 				this.commonRoomSocket.send(JSON.stringify({
+			            'counter': this.counter,
+			   			'command': 'read_messages_list'
+			        }));
+		 		},
+		 		updateMessage: function(arr){
 	 				for (var i = 0; i < this.messages.length; i++) {
-	 					if (this.messages[i].id == id){
-	 						this.messages[i].not_read = false
+	 					if (this.messages[i].id == arr.id){
+	 						this.messages[i].not_read = arr.not_read
+	 						this.messages[i].need_update = arr.need_update
 	 					}
 	 				}
 		 		}
