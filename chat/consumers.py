@@ -57,12 +57,15 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
             )
         message.had_read.add(user)
         message.save()
-        async_to_sync(self.channel_layer.group_send)(
-                self.room_group_name,
-                {
-                    'type': 'transmit_message',
-                    'new_message': message.message_pack(),
-                }
+        for addressee in room.all_members():
+            cache_key = 'chat_%s_user_%s' % (self.room_id, addressee.id)
+            addressee_channel_name = cache.get(cache_key)
+            async_to_sync(self.channel_layer.send)(
+                addressee_channel_name,
+                    {
+                        'type': 'transmit_message',
+                        'new_message': message.packed_dict(addressee),
+                    }
             )
  
     async def transmit_message(self, event):

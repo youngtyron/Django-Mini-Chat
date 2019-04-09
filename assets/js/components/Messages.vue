@@ -3,7 +3,9 @@
         <ul class="list-group">
         	<i class="far fa-arrow-alt-circle-up arrow-up-avocado fa-4x" @click="olderMessagesUpload" 
         														@mouseover="olderMessagesUpload"></i>
-	        <li class="list-group-item" v-bind:class="{not_read: message.not_read}" v-for="message in messages">
+	        <li class="list-group-item" 
+	        	v-bind:class="{not_read: message.not_read, my_message_block: message.mine, anothers_message_block: !message.mine}"
+	        	v-for="message in messages">
 	        	<div v-if="message.need_update" v-on:mouseover="readMessages">
 		    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
 		    		<p>{{message.text}}</p>
@@ -27,6 +29,9 @@
     		</div>
 		</form>
     </div>
+
+
+
 </template>
 
 <script>

@@ -36,37 +36,42 @@ class Message(models.Model):
 		date = self.date
 		return str(self.date.day) + 'th ' + calendar.month_name[self.date.month]
 
-	def message_pack(self):
-		images_pack = list()
-		images = self.image.all()
-		for image in images:
-			images_pack.append(image.image.url)
-		message_pack = {
-			'id': self.id,
-			'author':{'first_name':self.author.first_name, 'last_name':self.author.last_name, 'username': self.author.username},
-			'text': self.text,
-			'date': self.date_date_format(),
-			'time': self.date_time_format(),
-			'images': images_pack,
-			'not_read': True,
-			'need_update': True
-		}
-		return message_pack
+	# def message_pack(self):
+	# 	images_pack = list()
+	# 	images = self.image.all()
+	# 	for image in images:
+	# 		images_pack.append(image.image.url)
+	# 	message_pack = {
+	# 		'id': self.id,
+	# 		'author':{'first_name':self.author.first_name, 'last_name':self.author.last_name, 'username': self.author.username, 'id': self.author.id},
+	# 		'text': self.text,
+	# 		'date': self.date_date_format(),
+	# 		'time': self.date_time_format(),
+	# 		'images': images_pack,
+	# 		'not_read': True,
+	# 		'need_update': True
+	# 	}
+	# 	return message_pack
 
 	def packed_dict(self, user):
 		images_pack = list()
 		images = self.image.all()
 		for image in images:
 			images_pack.append(image.image.url)
+		if self.author == user:
+			mine = True
+		else:
+			mine = False
 		packed_dict = {
 			'id': self.id,
-			'author':{'first_name':self.author.first_name, 'last_name':self.author.last_name, 'username': self.author.username},
+			'author':{'first_name':self.author.first_name, 'last_name':self.author.last_name, 'username': self.author.username, 'id': self.author.id},
 			'text': self.text,
 			'date': self.date_date_format(),
 			'time': self.date_time_format(),
 			'images': images_pack,
 			'not_read': self.green_message_for_user(user),
-			'need_update': self.need_read_and_update(user)
+			'need_update': self.need_read_and_update(user),
+			'mine': mine
 		}
 		return packed_dict		
 
