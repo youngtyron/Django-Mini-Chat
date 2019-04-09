@@ -3,11 +3,19 @@
         <ul class="list-group">
         	<i class="far fa-arrow-alt-circle-up arrow-up-avocado fa-4x" @click="olderMessagesUpload" 
         														@mouseover="olderMessagesUpload"></i>
-	        <li class="list-group-item"  v-bind:class="{not_read: message.not_read}" v-for="message in messages">
-	    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
-	    		<p>{{message.text}}</p>
-	    		<p>{{message.time}}</p>
-	    		<p>{{message.date}}</p>
+	        <li class="list-group-item" v-bind:class="{not_read: message.not_read}" v-for="message in messages">
+	        	<div v-if="message.need_update" v-on:mouseover="readMessages">
+		    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
+		    		<p>{{message.text}}</p>
+		    		<p>{{message.time}}</p>
+		    		<p>{{message.date}}</p>
+	        	</div>
+	        	<div v-else>
+		    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
+		    		<p>{{message.text}}</p>
+		    		<p>{{message.time}}</p>
+		    		<p>{{message.date}}</p>
+	        	</div>
 	    	</li>
         </ul>
     	<form action="">
@@ -51,12 +59,6 @@
 	        		this.raw_messages = messages
 	        		this.messages = this.raw_messages.reverse().concat(this.messages)
 	        		this.counter = new_counter
-	        		for (var i = 0; i < this.messages.length; i++) {
-	        			if (this.messages[i].need_update){
-	        				this.readMessages();
-	        				break
-	        			}
-	        		}
 		    	}
 		    	else if (data['new_message']){
 			    	var message = data['new_message'];
@@ -103,7 +105,7 @@
 		 		readMessages: function(){
 	 				this.commonRoomSocket.send(JSON.stringify({
 			            'counter': this.counter,
-			   			'command': 'read_messages_list'
+			   			'command': 'read_messages'
 			        }));
 		 		},
 		 		updateMessage: function(arr){

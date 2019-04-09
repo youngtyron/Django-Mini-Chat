@@ -43,9 +43,9 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         elif data['command'] == 'get_messages':
             counter = data['counter']
             await self.get_messages_portion(counter)
-        elif data['command'] == 'read_messages_list':
+        elif data['command'] == 'read_messages':
             counter = data['counter']
-            await self.read_messages_list(counter)
+            await self.read_messages(counter)
 
     @database_sync_to_async
     def create_message(self, text_message):
@@ -99,7 +99,7 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         }))
 
     @database_sync_to_async
-    def read_messages_list(self, counter):
+    def read_messages(self, counter):
         room = Room.objects.get(id = self.room_id)
         all_messages = room.all_messages()[: counter]
         updating_messages = list()
@@ -124,7 +124,7 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
             async_to_sync(self.channel_layer.send)(
                 addressee_channel_name,
                     {
-                        'type': 'return_read_list',
+                        'type': 'return_read',
                         'updated_messages': distributed_data,
                     }
             )
@@ -136,7 +136,7 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         return False
 
     
-    async def return_read_list(self, event):
+    async def return_read(self, event):
         updated_messages = event['updated_messages']
         await self.send(text_data=json.dumps({
             'updated_messages': updated_messages
