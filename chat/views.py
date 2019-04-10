@@ -1,8 +1,8 @@
-# from django.views.generic.base import View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from chat.models import Room
+from chat.models import Room, MessageImage
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 
 
 class RoomListView(ListView):
@@ -19,3 +19,13 @@ class RoomDetailView(DetailView):
 	def get_object(self, **kwargs):
 		obj = get_object_or_404(Room, id = self.kwargs['room_id'])
 		return obj
+
+def ajax_images_sending(request, room_id):
+	if request.method == 'POST' and request.is_ajax:
+		room = get_object_or_404(Room, id = room_id)
+		images = request.FILES.getlist('images-input')
+		id_list = list()
+		for image in images:
+			pict = MessageImage.objects.create(room = room, image = image)
+			id_list.append(pict.id)
+		return JsonResponse({'id_list':id_list})

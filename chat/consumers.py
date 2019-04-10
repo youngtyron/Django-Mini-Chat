@@ -7,7 +7,7 @@ from channels.layers import get_channel_layer
 
 from django.core.cache import cache
 
-from chat.models import Message, Room
+from chat.models import Message, Room, MessageImage
 
 class CommonRoomConsumer(AsyncWebsocketConsumer):
 
@@ -37,9 +37,11 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
+        print(data)
         if data['command'] == 'create_message':
             text_message = data['message']
-            await self.create_message(text_message)
+            images_id_list = data['images']            
+            await self.create_message(text_message, images_id_list)
         elif data['command'] == 'get_messages':
             counter = data['counter']
             await self.get_messages_portion(counter)
@@ -48,13 +50,17 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
             await self.read_messages(counter)
 
     @database_sync_to_async
-    def create_message(self, text_message):
+    def create_message(self, text_message, images_id_list):
         room = Room.objects.get(id = self.room_id)
         user = self.scope["user"]
         message = Message.objects.create(author = user,
                                room = room,
                                text = text_message
             )
+        if images_id_list:
+            for image_id in images_id_list:
+                image = MessageImage.objects.get(id = image_id)
+                message.image.add(image)
         message.had_read.add(user)
         message.save()
         for addressee in room.all_members():

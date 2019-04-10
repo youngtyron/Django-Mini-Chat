@@ -11,12 +11,18 @@
 		    		<p>{{message.text}}</p>
 		    		<p>{{message.time}}</p>
 		    		<p>{{message.date}}</p>
+		    		<div v-for="image in message.images">
+		    			<img :src="image" alt="Image">
+		    		</div>
 	        	</div>
 	        	<div v-else>
 		    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
 		    		<p>{{message.text}}</p>
 		    		<p>{{message.time}}</p>
 		    		<p>{{message.date}}</p>
+		    		<div v-for="image in message.images">
+		    			<img :src="image" alt="Image">
+		    		</div>
 	        	</div>
 	    	</li>
         </ul>
@@ -24,9 +30,13 @@
     		<div class="form-group col-md-6">
     			<input type="text" id="message-input" v-model="text_input" required="required" class="form-control">
     		</div>
+
     		<div class="form-group col-md-6">
     			<button type="submit" class="btn btn-avocado" @click="sendMessage">Send</button>
     		</div>
+		</form>
+		<form enctype="multipart/form-data" id="images-form">
+		   	<input type="file" id="images-input" name="images-input" v-on:change="changeImagesInput" class="form-control" multiple>
 		</form>
     </div>
 
@@ -42,8 +52,10 @@
             	messages: [],
             	raw_messages: [],
             	text_input: '',
+            	images_input: '',
             	commonRoomSocket: null,
             	counter: 0,
+            	ImagesFormData: null
             }
         },
         mounted() {
@@ -58,6 +70,7 @@
 		    };
 		  	this.commonRoomSocket.addEventListener("message", e =>{
 		    	var data = JSON.parse(e.data);
+		    	console.log(data)
 		    	if (data['messages_portion']){
 	        		var messages = data['messages_portion']
 	        		var new_counter = data['counter']
@@ -85,13 +98,29 @@
 		 			e.preventDefault()
 		 			var text_message = this.text_input
 		 			text_message = text_message.trim()
+		 			var id_list = false
+		 			var commonRoomSocket = this.commonRoomSocket
 		 			if (text_message !=''){
-					   	this.commonRoomSocket.send(JSON.stringify({
-					            'message': text_message,
-					            'command': 'create_message'
-					        }));
+					   	axios.post('/chat/send_message_images/' + this.room_id + '/', this.ImagesFormData, {
+					        headers: {
+					          'Content-Type': 'multipart/form-data'
+					        }
+					    }).then(function(response){
+					    	id_list = response.data['id_list']
+						   	commonRoomSocket.send(JSON.stringify({
+						            'message': text_message,
+						            'images' : id_list,
+						            'command': 'create_message'
+						        }));
+					    }).catch(function(error){
+					    	console.error(error)
+					  		this.text_input=''
+					  		this.ImagesFormData == null
+					    });
+
 		 			}
 			  		this.text_input=''
+			  		this.ImagesFormData == null
 		 		},
 		 		keyListener: function(e){
 		 			var key = e.keyCode
@@ -120,6 +149,9 @@
 	 						this.messages[i].need_update = arr.need_update
 	 					}
 	 				}
+		 		},
+		 		changeImagesInput: function(){
+		 			this.ImagesFormData = new FormData(document.getElementById('images-form'))
 		 		}
 
             }      

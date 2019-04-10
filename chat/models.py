@@ -36,23 +36,6 @@ class Message(models.Model):
 		date = self.date
 		return str(self.date.day) + 'th ' + calendar.month_name[self.date.month]
 
-	# def message_pack(self):
-	# 	images_pack = list()
-	# 	images = self.image.all()
-	# 	for image in images:
-	# 		images_pack.append(image.image.url)
-	# 	message_pack = {
-	# 		'id': self.id,
-	# 		'author':{'first_name':self.author.first_name, 'last_name':self.author.last_name, 'username': self.author.username, 'id': self.author.id},
-	# 		'text': self.text,
-	# 		'date': self.date_date_format(),
-	# 		'time': self.date_time_format(),
-	# 		'images': images_pack,
-	# 		'not_read': True,
-	# 		'need_update': True
-	# 	}
-	# 	return message_pack
-
 	def packed_dict(self, user):
 		images_pack = list()
 		images = self.image.all()
