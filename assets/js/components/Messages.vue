@@ -44,14 +44,15 @@
 				</button>
 				<input type="file" id="images-input" name="images-input" v-on:change="changeImagesInput" class="form-control" multiple>
 			</form>
-			<div>
-				<div v-for="i in 10" class="modal-img-div">
-					<img class="modal-img-exmp-place" src="" alt="">		
-				</div>
+			<div class="modal-flex-img-container">
+			  <div  v-for="i in 3" class="modal-flex-img-row">
+				  <div v-for="i in 3" class="modal-flex-img-col">
+				  	<img class="modal-img-exmp-place" src="" alt="">
+				  </div>
+				  <button id="attach-images-button" style="display: none;" type="button" @click="attachImages">Attach</button>
+			  </div>
 			</div>
 		</div>
-	
-
     </div>
 
 
@@ -202,6 +203,7 @@
 						    }
 							reader.readAsDataURL(inp.files[i], i);
 						}
+						document.getElementById('attach-images-button').style.display = 'block';
 		 			}
 
 		 		},
@@ -210,6 +212,10 @@
 		 		},
 		 		activateImagesInput: function(){
 		 			document.getElementById('images-input').click();
+		 		},
+		 		attachImages: function(){
+					this.ImagesFormData = new FormData(document.getElementById('images-form'))
+					this.ImageLoadModal = false
 		 		}
             }      
         };
