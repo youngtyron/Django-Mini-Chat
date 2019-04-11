@@ -37,7 +37,6 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
-        print(data)
         if data['command'] == 'create_message':
             text_message = data['message']
             images_id_list = data['images']            

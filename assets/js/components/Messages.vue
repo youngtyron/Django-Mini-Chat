@@ -12,7 +12,7 @@
 		    		<p>{{message.time}}</p>
 		    		<p>{{message.date}}</p>
 		    		<div v-for="image in message.images">
-		    			<img :src="image" alt="Image">
+		    			<img class="message-img" :src="image" alt="Image">
 		    		</div>
 	        	</div>
 	        	<div v-else>
@@ -28,16 +28,30 @@
         </ul>
     	<form action="">
     		<div class="form-group col-md-6">
-    			<input type="text" id="message-input" v-model="text_input" required="required" class="form-control">
+    			<input type="text" id="message-input" v-model="text_input" class="form-control">
     		</div>
 
     		<div class="form-group col-md-6">
+    			<i class="fas fa-camera-retro fa-2x avocado-icon" @click="activateImageLoadModal"></i>
     			<button type="submit" class="btn btn-avocado" @click="sendMessage">Send</button>
     		</div>
 		</form>
-		<form enctype="multipart/form-data" id="images-form">
-		   	<input type="file" id="images-input" name="images-input" v-on:change="changeImagesInput" class="form-control" multiple>
-		</form>
+		<div v-if="ImageLoadModal" class="modal-image-load-form text-center">
+			<form enctype="multipart/form-data" id="images-form">
+				<button type="button" class="btn btn-avocado btn-lg btn-block" @click="activateImagesInput">
+					<h4>Add images to your message</h4>
+					<i class="far fa-plus-square fa-2x" style="color: #FFFFFF;"></i>
+				</button>
+				<input type="file" id="images-input" name="images-input" v-on:change="changeImagesInput" class="form-control" multiple>
+			</form>
+			<div>
+				<div v-for="i in 10" class="modal-img-div">
+					<img class="modal-img-exmp-place" src="" alt="">		
+				</div>
+			</div>
+		</div>
+	
+
     </div>
 
 
@@ -55,7 +69,8 @@
             	images_input: '',
             	commonRoomSocket: null,
             	counter: 0,
-            	ImagesFormData: null
+            	ImagesFormData: null,
+            	ImageLoadModal: false,
             }
         },
         mounted() {
@@ -70,7 +85,6 @@
 		    };
 		  	this.commonRoomSocket.addEventListener("message", e =>{
 		    	var data = JSON.parse(e.data);
-		    	console.log(data)
 		    	if (data['messages_portion']){
 	        		var messages = data['messages_portion']
 	        		var new_counter = data['counter']
@@ -99,9 +113,12 @@
 		 			var text_message = this.text_input
 		 			text_message = text_message.trim()
 		 			var id_list = false
+		 			var ImagesFormData = this.ImagesFormData
 		 			var commonRoomSocket = this.commonRoomSocket
-		 			if (text_message !=''){
-					   	axios.post('/chat/send_message_images/' + this.room_id + '/', this.ImagesFormData, {
+		 			this.ImagesFormData = null
+		 			this.text_input = ''
+		 			if (text_message !='' && ImagesFormData != null){
+					   	axios.post('/chat/send_message_images/' + this.room_id + '/', ImagesFormData, {
 					        headers: {
 					          'Content-Type': 'multipart/form-data'
 					        }
@@ -114,13 +131,32 @@
 						        }));
 					    }).catch(function(error){
 					    	console.error(error)
-					  		this.text_input=''
-					  		this.ImagesFormData == null
 					    });
 
 		 			}
-			  		this.text_input=''
-			  		this.ImagesFormData == null
+		 			else if (ImagesFormData != null){
+					   	axios.post('/chat/send_message_images/' + this.room_id + '/', ImagesFormData, {
+					        headers: {
+					          'Content-Type': 'multipart/form-data'
+					        }
+					    }).then(function(response){
+					    	id_list = response.data['id_list']
+						   	commonRoomSocket.send(JSON.stringify({
+						            'message': null,
+						            'images' : id_list,
+						            'command': 'create_message'
+						        }));
+					    }).catch(function(error){
+					    	console.error(error)
+					    });		 				
+		 			}
+		 			else if (text_message != ''){
+					   	commonRoomSocket.send(JSON.stringify({
+					            'message': text_message,
+					            'images' : id_list,
+					            'command': 'create_message'
+					        }));		 			
+		 			}
 		 		},
 		 		keyListener: function(e){
 		 			var key = e.keyCode
@@ -151,9 +187,30 @@
 	 				}
 		 		},
 		 		changeImagesInput: function(){
-		 			this.ImagesFormData = new FormData(document.getElementById('images-form'))
-		 		}
+		 			var inp = document.getElementById('images-input');
+		 			var images = inp.files;
+		 			if (images.length<=10){
+		 				for (var i = 0; i < images.length; i++) {
+			 				var reader = new FileReader();
+			 			    reader.onload = function(e, i) {
+			 			    	var place = $('.modal-img-exmp-place')[0];
+			 			    	place.src = e.target.result;
+			 			    	place.classList.remove("modal-img-exmp-place");
+			 			    	place.classList.add("modal-img-exmp");
+			 			    	place.style.maxWidth = '100%';
+			 			    	place.style.minWidth = '100%';
+						    }
+							reader.readAsDataURL(inp.files[i], i);
+						}
+		 			}
 
+		 		},
+		 		activateImageLoadModal: function(){
+		 			this.ImageLoadModal = true;
+		 		},
+		 		activateImagesInput: function(){
+		 			document.getElementById('images-input').click();
+		 		}
             }      
         };
 </script>
