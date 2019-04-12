@@ -47,6 +47,9 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         elif data['command'] == 'read_messages':
             counter = data['counter']
             await self.read_messages(counter)
+        elif data['command'] == 'typing':
+            print('command typing')
+            await self.typing_translate()
 
     @database_sync_to_async
     def create_message(self, text_message, images_id_list):
@@ -148,4 +151,23 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         updated_messages = event['updated_messages']
         await self.send(text_data=json.dumps({
             'updated_messages': updated_messages
+        }))
+
+    async def typing_translate(self):
+        print('typing_translate')
+        user = self.scope["user"]
+        await self.channel_layer.group_send(
+            self.room_group_name,
+                {
+                    'type': 'return_typing',
+                    'user_data': str(user.first_name)+' '+str(user.last_name),               
+                }
+        )
+
+    async def return_typing(self, event):
+        print('return_typing')
+        user_data = event['user_data']
+        print(user_data)
+        await self.send(text_data=json.dumps({
+            'user_is_typing': user_data,
         }))

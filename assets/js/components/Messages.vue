@@ -36,7 +36,8 @@
         </ul>
     	<form action="">
     		<div class="form-group col-md-6">
-    			<input type="text" id="message-input" v-model="text_input" class="form-control">
+    			<input type="text" id="message-input" v-model="text_input" class="form-control" 
+    												  v-on:keypress='translateTyping(); keyPressTracking(7000)'>
     		</div>
 
     		<div class="form-group col-md-6">
@@ -76,6 +77,7 @@
             	counter: 0,
             	ImagesFormData: null,
             	ImageLoadModal: false,
+            	typingInProcess: false,
             }
         },
         mounted() {
@@ -106,6 +108,10 @@
 	        		for (var i = 0; i < updated.length; i++) {
 	        			this.updateMessage(updated[i]);
 	        		}
+		    	}
+		    	else if (data['user_is_typing']){
+			    	var user_name = data['user_is_typing'];
+			    	console.log(user_name + ' type a message...')
 		    	}
 
 		  	});
@@ -224,6 +230,23 @@
 		 		attachImages: function(){
 					this.ImagesFormData = new FormData(document.getElementById('images-form'))
 					this.ImageLoadModal = false
+		 		},
+		 		stopTypeTracking: function(){
+		 			this.typingInProcess = false;
+		 		},
+		 		keyPressTracking: function(timer){
+		 			var text_area = document.getElementById('message-input');
+		 			this.typingInProcess = true;
+		 			window.clearTimeout(timer);
+					timer = setTimeout(this.stopTypeTracking, 7000);
+		 		},
+		 		translateTyping: function(){
+		 			if (this.typingInProcess == false){
+		 				console.log('translateTyping')
+		 				this.commonRoomSocket.send(JSON.stringify({
+				   			'command': 'typing'
+				        }));
+		 			}
 		 		}
             }      
         };
