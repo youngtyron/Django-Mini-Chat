@@ -11,8 +11,12 @@
 		    		<p>{{message.text}}</p>
 		    		<p>{{message.time}}</p>
 		    		<p>{{message.date}}</p>
-		    		<div v-for="image in message.images">
-		    			<img class="message-img" :src="image" alt="Image">
+		    		<div class="message-flex-img-container">
+ 	   		    		<div class="message-flex-img-row">
+		   		    		<div class="message-flex-img-col" v-for="image in message.images">
+		    					<img :src="image" class="message-img" alt="Image">
+		    				</div> 			
+	    				</div> 		 		
 		    		</div>
 	        	</div>
 	        	<div v-else>
@@ -20,8 +24,12 @@
 		    		<p>{{message.text}}</p>
 		    		<p>{{message.time}}</p>
 		    		<p>{{message.date}}</p>
-		    		<div v-for="image in message.images">
-		    			<img :src="image" alt="Image">
+		    		<div class="message-flex-img-container">
+ 	   		    		<div class="message-flex-img-row">
+		   		    		<div class="message-flex-img-col" v-for="image in message.images">
+		    					<img :src="image" class="message-img" alt="Image">
+		    				</div> 			
+	    				</div> 		 		
 		    		</div>
 	        	</div>
 	    	</li>
@@ -32,26 +40,22 @@
     		</div>
 
     		<div class="form-group col-md-6">
-    			<i class="fas fa-camera-retro fa-2x avocado-icon" @click="activateImageLoadModal"></i>
+    			<i class="fas fa-camera-retro fa-2x avocado-icon" @click="activateImagesInput"></i>
     			<button type="submit" class="btn btn-avocado" @click="sendMessage">Send</button>
     		</div>
 		</form>
-		<div v-if="ImageLoadModal" class="modal-image-load-form text-center">
-			<form enctype="multipart/form-data" id="images-form">
-				<button type="button" class="btn btn-avocado btn-lg btn-block" @click="activateImagesInput">
-					<h4>Add images to your message</h4>
-					<i class="far fa-plus-square fa-2x" style="color: #FFFFFF;"></i>
-				</button>
-				<input type="file" id="images-input" name="images-input" v-on:change="changeImagesInput" class="form-control" multiple>
-			</form>
+		<form enctype="multipart/form-data" id="images-form">
+			<input type="file" id="images-input" name="images-input" v-on:change="postInputClick" class="form-control" multiple>
+		</form>
+		<div v-if="ImageLoadModal" class="modal-image-gallery-window text-center">
 			<div class="modal-flex-img-container">
 			  <div  v-for="i in 3" class="modal-flex-img-row">
 				  <div v-for="i in 3" class="modal-flex-img-col">
 				  	<img class="modal-img-exmp-place" src="" alt="">
 				  </div>
-				  <button id="attach-images-button" style="display: none;" type="button" @click="attachImages">Attach</button>
 			  </div>
 			</div>
+			<button id="attach-images-button" class="btn btn-avocado" type="button" @click="attachImages">Attach</button>
 		</div>
     </div>
 
@@ -187,28 +191,32 @@
 	 					}
 	 				}
 		 		},
-		 		changeImagesInput: function(){
+		 		preloadImagesGallery: function(images){
+	 				for (var i = 0; i < images.length; i++) {
+		 				var reader = new FileReader();
+		 			    reader.onload = function(e, i) {
+		 			    	var place = $('.modal-img-exmp-place')[0];
+		 			    	place.src = e.target.result;
+		 			    	place.classList.remove("modal-img-exmp-place");
+		 			    	place.classList.add("modal-img-exmp");
+		 			    	place.style.maxWidth = '80%';
+		 			    	place.style.minWidth = '80%';
+					    }
+						reader.readAsDataURL(images[i], i);
+					}
+		 		},
+		 		postInputClick: function(){
 		 			var inp = document.getElementById('images-input');
 		 			var images = inp.files;
-		 			if (images.length<=10){
-		 				for (var i = 0; i < images.length; i++) {
-			 				var reader = new FileReader();
-			 			    reader.onload = function(e, i) {
-			 			    	var place = $('.modal-img-exmp-place')[0];
-			 			    	place.src = e.target.result;
-			 			    	place.classList.remove("modal-img-exmp-place");
-			 			    	place.classList.add("modal-img-exmp");
-			 			    	place.style.maxWidth = '100%';
-			 			    	place.style.minWidth = '100%';
-						    }
-							reader.readAsDataURL(inp.files[i], i);
-						}
-						document.getElementById('attach-images-button').style.display = 'block';
+		 			if (images.length>9){
+		 				document.getElementById('images-input').files = null;
+		 				alert("You can't attach more than 9 pictures");
 		 			}
-
-		 		},
-		 		activateImageLoadModal: function(){
-		 			this.ImageLoadModal = true;
+		 			else{
+		 				console.log('click')
+		 				this.ImageLoadModal = true;
+		 				this.preloadImagesGallery(images);
+		 			}
 		 		},
 		 		activateImagesInput: function(){
 		 			document.getElementById('images-input').click();
