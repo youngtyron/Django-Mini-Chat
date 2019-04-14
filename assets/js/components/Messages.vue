@@ -1,5 +1,11 @@
 <template>
-    <div>
+	<div>
+		<div>
+			<div v-for="user in users">
+				<p>{{user.first_name}} {{user.last_name}}</p>
+				<p v-if="user.online">Online</p>
+			</div>
+		</div>
         <ul class="list-group">
         	<i class="far fa-arrow-alt-circle-up arrow-up-avocado fa-4x" @click="olderMessagesUpload" 
         														@mouseover="olderMessagesUpload"></i>
@@ -69,6 +75,7 @@
     	props: ['room_id'],
         data(){
             return  {
+            	users: [],
             	messages: [],
             	raw_messages: [],
             	text_input: '',
@@ -77,10 +84,10 @@
             	counter: 0,
             	ImagesFormData: null,
             	ImageLoadModal: false,
-            	typingInProcess: false,
             }
         },
         mounted() {
+        	this.getUsers();
         	this.commonRoomSocket = new WebSocket(
 		        'ws://' + window.location.host +'/ws/chat/common/' + this.room_id + '/');
 		    var counter = this.counter
@@ -113,12 +120,28 @@
 			    	var user_name = data['user_is_typing'];
 			    	console.log(user_name + ' type a message...')
 		    	}
-
+		    	else if (data['user_stopped_typing']){
+			    	var user_name = data['user_stopped_typing'];
+			    	console.log(user_name + ' stopped typing.')
+		    	}
+		    	else if (data['user_become_online']){
+			    	var user_name = data['user_become_online'];
+			    	console.log(user_name + ' get online just now.')
+		    	}
+		    	else if (data['user_become_offline']){
+			    	var user_name = data['user_become_offline'];
+			    	console.log(user_name + ' get offline just now.')
+		    	}
 		  	});
 			window.addEventListener('keypress', this.keyListener);
 
         },
         methods: {
+        		getUsers: function(){
+				   	axios.get('/chat/get_users/' + this.room_id + '/').then((response) => {
+ 						this.users = response.data['users'];
+                    });
+        		},
 		 		sendMessage: function(e){
 		 			e.preventDefault()
 		 			var text_message = this.text_input
@@ -232,21 +255,19 @@
 					this.ImageLoadModal = false
 		 		},
 		 		stopTypeTracking: function(){
-		 			this.typingInProcess = false;
+	 				this.commonRoomSocket.send(JSON.stringify({
+			   			'command': 'stoptyping'
+			        }));
 		 		},
 		 		keyPressTracking: function(timer){
-		 			var text_area = document.getElementById('message-input');
-		 			this.typingInProcess = true;
+					var text_area = document.getElementById('message-input');
 		 			window.clearTimeout(timer);
 					timer = setTimeout(this.stopTypeTracking, 7000);
 		 		},
 		 		translateTyping: function(){
-		 			if (this.typingInProcess == false){
-		 				console.log('translateTyping')
-		 				this.commonRoomSocket.send(JSON.stringify({
-				   			'command': 'typing'
-				        }));
-		 			}
+	 				this.commonRoomSocket.send(JSON.stringify({
+			   			'command': 'typing'
+			        }));
 		 		}
             }      
         };

@@ -27,11 +27,12 @@ from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from django.core.cache import cache
 
 from .forms import RegistrationForm
+from chat.views import become_online_chat_announcement, become_offline_chat_announcement
 
 UserModel = get_user_model()
-
 
 class ProfileView(DetailView):
     template_name = 'profile.html'
@@ -54,21 +55,18 @@ class RegistrationView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        print('-----------------')
         username = form.cleaned_data['username']
         first_name = form.cleaned_data['first_name']
         last_name = form.cleaned_data['last_name']
         email = form.cleaned_data['email']
         password = form.cleaned_data['password1']
-        print(form.cleaned_data['password1'])
-        print(password)
-        print('------------------')
         user = User.objects.create_user(username = username,
                                         email = email,
                                         password = password,
                                         first_name = first_name,
                                         last_name = last_name)
         auth_login(self.request, user)
+        cache.add('user_online_' + str(self.request.user.id), True, 999999)
         return super(RegistrationView, self).form_valid(form)
 
 class SuccessURLAllowedHostsMixin:
@@ -131,6 +129,8 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
     def form_valid(self, form):
         """Security check complete. Log the user in."""
         auth_login(self.request, form.get_user())
+        cache.add('user_online_' + str(self.request.user.id), True, 999999)
+        become_online_chat_announcement(self.request.user)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
@@ -156,6 +156,8 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
 
     @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
+        become_offline_chat_announcement(self.request.user)
+        cache.delete('user_online_' + str(self.request.user.id))
         auth_logout(request)
         next_page = self.get_next_page()
         if next_page:

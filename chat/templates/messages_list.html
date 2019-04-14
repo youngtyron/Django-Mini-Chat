@@ -3,9 +3,7 @@
 {% block content %}
 <div class="row">
 	<div class="col-4">
-		{% for member in room.all_members %}
-		  <p>{{member.first_name}} {{member.last_name}}</p>
-		{% endfor %}
+		
 	</div>
 	<div class="col-8">
 		{% csrf_token %}

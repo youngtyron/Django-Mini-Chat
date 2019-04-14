@@ -50,6 +50,9 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         elif data['command'] == 'typing':
             print('command typing')
             await self.typing_translate()
+        elif data['command'] == 'stoptyping':
+            print('command stoptyping')
+            await self.stoptyping_translate()
 
     @database_sync_to_async
     def create_message(self, text_message, images_id_list):
@@ -102,6 +105,7 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         )
 
     async def load_messages(self, event):
+        print('SELF:' + str(self))
         messages = event['messages_portion']
         counter = event['counter']
         await self.send(text_data=json.dumps({
@@ -154,7 +158,6 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         }))
 
     async def typing_translate(self):
-        print('typing_translate')
         user = self.scope["user"]
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -165,9 +168,35 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         )
 
     async def return_typing(self, event):
-        print('return_typing')
         user_data = event['user_data']
-        print(user_data)
         await self.send(text_data=json.dumps({
             'user_is_typing': user_data,
+        }))
+
+    async def stoptyping_translate(self):
+        user = self.scope["user"]
+        await self.channel_layer.group_send(
+            self.room_group_name,
+                {
+                    'type': 'return_stoptyping',
+                    'user_data': str(user.first_name)+' '+str(user.last_name),               
+                }
+        )
+
+    async def return_stoptyping(self, event):
+        user_data = event['user_data']
+        await self.send(text_data=json.dumps({
+            'user_stopped_typing': user_data,
+        }))
+
+    async def return_become_online(self, event):
+        user = event['user']
+        await self.send(text_data=json.dumps({
+            'user_become_online': user,
+        }))
+
+    async def return_become_offline(self, event):
+        user = event['user']
+        await self.send(text_data=json.dumps({
+            'user_become_offline': user,
         }))
