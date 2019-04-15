@@ -2,7 +2,12 @@
 	<div class="row">
 		<div class="col-4">
 			<div v-for="user in users">
-				<p>{{user.first_name}} {{user.last_name}}</p>
+				<p>
+					<div class="chat-member-list-avatar-div">
+						<img :src="user.avatar" alt="Avatar" class="chat-member-list-avatar-img">
+					</div>
+					{{user.first_name}} {{user.last_name}}
+				</p>
 				<p v-if="user.online == true">Online</p>
 			</div>
 		</div>

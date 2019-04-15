@@ -43,7 +43,11 @@ def ajax_get_users(request, room_id):
 		users_list = list()
 		for user in users:
 			online = cache.get('user_online_' + str(user.id))
-			user_dict = {'first_name': user.first_name, 'last_name': user.last_name, 'online': online, 'id': user.id}
+			user_dict = {'first_name': user.first_name, 
+						'last_name': user.last_name, 
+						'online': online, 
+						'id': user.id,
+						'avatar': user.chatprofile.avatar.url}
 			users_list.append(user_dict)
 		return JsonResponse({'users': users_list})
 
