@@ -1,73 +1,72 @@
 <template>
-	<div>
-		<div>
+	<div class="row">
+		<div class="col-4">
 			<div v-for="user in users">
 				<p>{{user.first_name}} {{user.last_name}}</p>
-				<p v-if="user.online">Online</p>
+				<p v-if="user.online == true">Online</p>
 			</div>
 		</div>
-        <ul class="list-group">
-        	<i class="far fa-arrow-alt-circle-up arrow-up-avocado fa-4x" @click="olderMessagesUpload" 
-        														@mouseover="olderMessagesUpload"></i>
-	        <li class="list-group-item" 
-	        	v-bind:class="{not_read: message.not_read, my_message_block: message.mine, anothers_message_block: !message.mine}"
-	        	v-for="message in messages">
-	        	<div v-if="message.need_update" v-on:mouseover="readMessages">
-		    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
-		    		<p>{{message.text}}</p>
-		    		<p>{{message.time}}</p>
-		    		<p>{{message.date}}</p>
-		    		<div class="message-flex-img-container">
- 	   		    		<div class="message-flex-img-row">
-		   		    		<div class="message-flex-img-col" v-for="image in message.images">
-		    					<img :src="image" class="message-img" alt="Image">
-		    				</div> 			
-	    				</div> 		 		
-		    		</div>
-	        	</div>
-	        	<div v-else>
-		    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
-		    		<p>{{message.text}}</p>
-		    		<p>{{message.time}}</p>
-		    		<p>{{message.date}}</p>
-		    		<div class="message-flex-img-container">
- 	   		    		<div class="message-flex-img-row">
-		   		    		<div class="message-flex-img-col" v-for="image in message.images">
-		    					<img :src="image" class="message-img" alt="Image">
-		    				</div> 			
-	    				</div> 		 		
-		    		</div>
-	        	</div>
-	    	</li>
-        </ul>
-    	<form action="">
-    		<div class="form-group col-md-6">
-    			<input type="text" id="message-input" v-model="text_input" class="form-control" 
-    												  v-on:keypress='translateTyping(); keyPressTracking(7000)'>
-    		</div>
+		<div class="col-8">
+	        <ul class="list-group">
+	        	<i class="far fa-arrow-alt-circle-up arrow-up-avocado fa-4x" @click="olderMessagesUpload" 
+	        														@mouseover="olderMessagesUpload"></i>
+		        <li class="list-group-item" 
+		        	v-bind:class="{not_read: message.not_read, my_message_block: message.mine, anothers_message_block: !message.mine}"
+		        	v-for="message in messages">
+		        	<div v-if="message.need_update" v-on:mouseover="readMessages">
+			    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
+			    		<p>{{message.text}}</p>
+			    		<p>{{message.time}}</p>
+			    		<p>{{message.date}}</p>
+			    		<div class="message-flex-img-container">
+	 	   		    		<div class="message-flex-img-row">
+			   		    		<div class="message-flex-img-col" v-for="image in message.images">
+			    					<img :src="image" class="message-img" alt="Image">
+			    				</div> 			
+		    				</div> 		 		
+			    		</div>
+		        	</div>
+		        	<div v-else>
+			    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
+			    		<p>{{message.text}}</p>
+			    		<p>{{message.time}}</p>
+			    		<p>{{message.date}}</p>
+			    		<div class="message-flex-img-container">
+	 	   		    		<div class="message-flex-img-row">
+			   		    		<div class="message-flex-img-col" v-for="image in message.images">
+			    					<img :src="image" class="message-img" alt="Image">
+			    				</div> 			
+		    				</div> 		 		
+			    		</div>
+		        	</div>
+		    	</li>
+	        </ul>
+	    	<form action="">
+	    		<div class="form-group col-md-6">
+	    			<input type="text" id="message-input" v-model="text_input" class="form-control" 
+	    												  v-on:keypress='translateTyping(); keyPressTracking(7000)'>
+	    		</div>
 
-    		<div class="form-group col-md-6">
-    			<i class="fas fa-camera-retro fa-2x avocado-icon" @click="activateImagesInput"></i>
-    			<button type="submit" class="btn btn-avocado" @click="sendMessage">Send</button>
-    		</div>
-		</form>
-		<form enctype="multipart/form-data" id="images-form">
-			<input type="file" id="images-input" name="images-input" v-on:change="postInputClick" class="form-control" multiple>
-		</form>
-		<div v-if="ImageLoadModal" class="modal-image-gallery-window text-center">
-			<div class="modal-flex-img-container">
-			  <div  v-for="i in 3" class="modal-flex-img-row">
-				  <div v-for="i in 3" class="modal-flex-img-col">
-				  	<img class="modal-img-exmp-place" src="" alt="">
+	    		<div class="form-group col-md-6">
+	    			<i class="fas fa-camera-retro fa-2x avocado-icon" @click="activateImagesInput"></i>
+	    			<button type="submit" class="btn btn-avocado" @click="sendMessage">Send</button>
+	    		</div>
+			</form>
+			<form enctype="multipart/form-data" id="images-form">
+				<input type="file" id="images-input" name="images-input" v-on:change="postInputClick" class="form-control" multiple>
+			</form>
+			<div v-if="ImageLoadModal" class="modal-image-gallery-window text-center">
+				<div class="modal-flex-img-container">
+				  <div  v-for="i in 3" class="modal-flex-img-row">
+					  <div v-for="i in 3" class="modal-flex-img-col">
+					  	<img class="modal-img-exmp-place" src="" alt="">
+					  </div>
 				  </div>
-			  </div>
+				</div>
+				<button id="attach-images-button" class="btn btn-avocado" type="button" @click="attachImages">Attach</button>
 			</div>
-			<button id="attach-images-button" class="btn btn-avocado" type="button" @click="attachImages">Attach</button>
 		</div>
     </div>
-
-
-
 </template>
 
 <script>
@@ -125,12 +124,20 @@
 			    	console.log(user_name + ' stopped typing.')
 		    	}
 		    	else if (data['user_become_online']){
-			    	var user_name = data['user_become_online'];
-			    	console.log(user_name + ' get online just now.')
-		    	}
+					for (var i = 0; i < this.users.length; i++) {
+						if (this.users[i].id == data['user_become_online'].id){
+							this.users[i].online = true
+							break;
+						}
+					}
+			    }
 		    	else if (data['user_become_offline']){
-			    	var user_name = data['user_become_offline'];
-			    	console.log(user_name + ' get offline just now.')
+					for (var i = 0; i < this.users.length; i++) {
+						if (this.users[i].id == data['user_become_offline'].id){
+							this.users[i].online = false
+							break;
+						}
+					}
 		    	}
 		  	});
 			window.addEventListener('keypress', this.keyListener);

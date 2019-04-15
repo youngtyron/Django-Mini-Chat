@@ -43,13 +43,14 @@ def ajax_get_users(request, room_id):
 		users_list = list()
 		for user in users:
 			online = cache.get('user_online_' + str(user.id))
-			user_dict = {'first_name': user.first_name, 'last_name': user.last_name, 'online': online}
+			user_dict = {'first_name': user.first_name, 'last_name': user.last_name, 'online': online, 'id': user.id}
 			users_list.append(user_dict)
 		return JsonResponse({'users': users_list})
 
 
 def become_online_chat_announcement(user):
     rooms = Room.objects.filter(member = user)
+    user_data = {'online': True, 'id': user.id}
     channel_layer = get_channel_layer()				
     for room in rooms:
         room_group_name = 'chat_%s' % (room.id)
@@ -57,13 +58,14 @@ def become_online_chat_announcement(user):
             room_group_name,
                 {
                     'type': 'return_become_online',
-                    'user': user.username,                  
+                    'user_data': user_data,                  
                 }
         )
     return
 
 def become_offline_chat_announcement(user):
     rooms = Room.objects.filter(member = user)
+    user_data = {'online': False, 'id': user.id}
     channel_layer = get_channel_layer()				
     for room in rooms:
         room_group_name = 'chat_%s' % (room.id)
@@ -71,7 +73,7 @@ def become_offline_chat_announcement(user):
             room_group_name,
                 {
                     'type': 'return_become_offline',
-                    'user': user.username,                  
+                    'user_data': user_data,                  
                 }
         )
     return 

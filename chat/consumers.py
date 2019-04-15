@@ -105,7 +105,6 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         )
 
     async def load_messages(self, event):
-        print('SELF:' + str(self))
         messages = event['messages_portion']
         counter = event['counter']
         await self.send(text_data=json.dumps({
@@ -190,13 +189,13 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         }))
 
     async def return_become_online(self, event):
-        user = event['user']
+        user_data = event['user_data']
         await self.send(text_data=json.dumps({
-            'user_become_online': user,
+            'user_become_online': user_data,
         }))
 
     async def return_become_offline(self, event):
-        user = event['user']
+        user_data = event['user_data']
         await self.send(text_data=json.dumps({
-            'user_become_offline': user,
+            'user_become_offline': user_data,
         }))
