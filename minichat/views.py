@@ -28,11 +28,21 @@ from django.views.generic.detail import DetailView
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import RegistrationForm
 from chat.views import become_online_chat_announcement, become_offline_chat_announcement
 
 UserModel = get_user_model()
+
+class EditProfile(TemplateView, LoginRequiredMixin):
+    template_name = 'edit_profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['avatar'] = [self.request.user.chatprofile.avatar.url]
+        context['user'] = self.request.user
+        return context
 
 class ProfileView(DetailView):
     template_name = 'profile.html'
@@ -46,7 +56,7 @@ class RegistrationView(FormView):
 
     template_name = 'registration.html'
     form_class = RegistrationForm
-    success_url = '/'
+    success_url = '/edit_profile'
 
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:

@@ -103,5 +103,15 @@
 	border-radius: 50%;
 }
 .chat-member-list-avatar-div{
-
+}
+.edit-profile-avatar-div{
+/*	width: 45%;
+	height: 45%;	*/
+}
+#edit-profile-avatar-img{
+	width: 250px;
+	height: 250px;	
+/*	max-width: 80%;
+    max-height: 80%;	*/
+    border-radius: 50%;
 }

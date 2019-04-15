@@ -18,6 +18,7 @@ urlpatterns = [
     path('password_change/done/', views.PasswordChangeDoneView.as_view(), name='password_change_done'),
     path('registration/', views.RegistrationView.as_view(), name='registration'),
     path('profile/<str:username>', views.ProfileView.as_view(), name='profile'),
+    path('edit_profile/', views.EditProfile.as_view(), name='edit_profile'),
     path('chat/', include('chat.urls', namespace='chat')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
