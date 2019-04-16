@@ -254,7 +254,6 @@
 		 				alert("You can't attach more than 9 pictures");
 		 			}
 		 			else{
-		 				console.log('click')
 		 				this.ImageLoadModal = true;
 		 				this.preloadImagesGallery(images);
 		 			}

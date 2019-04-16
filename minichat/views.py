@@ -13,7 +13,7 @@ from django.contrib.auth.forms import (
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect, QueryDict, HttpResponse
+from django.http import HttpResponseRedirect, QueryDict, HttpResponse, JsonResponse
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -32,6 +32,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import RegistrationForm
 from chat.views import become_online_chat_announcement, become_offline_chat_announcement
+from chat.models import ChatProfile
 
 UserModel = get_user_model()
 
@@ -43,6 +44,15 @@ class EditProfile(TemplateView, LoginRequiredMixin):
         context['avatar'] = [self.request.user.chatprofile.avatar.url]
         context['user'] = self.request.user
         return context
+
+@login_required
+def new_avatar(request):
+    if request.method == 'POST' and request.is_ajax:
+        pict = request.FILES['avatar-input']
+        profile = get_object_or_404(ChatProfile, user = request.user)
+        profile.avatar = pict
+        profile.save()
+        return JsonResponse({'avatar_url': profile.avatar_url()})
 
 class ProfileView(DetailView):
     template_name = 'profile.html'

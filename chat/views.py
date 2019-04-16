@@ -6,8 +6,8 @@ from django.http import JsonResponse, HttpResponse
 from django.core.cache import cache
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-
-from chat.consumers import CommonRoomConsumer
+from django.contrib.auth.decorators import login_required
+# from chat.consumers import CommonRoomConsumer
 
 class RoomListView(ListView):
 	template_name = 'room_list.html'
@@ -24,6 +24,7 @@ class RoomDetailView(DetailView):
 		obj = get_object_or_404(Room, id = self.kwargs['room_id'])
 		return obj
 
+@login_required
 def ajax_images_sending(request, room_id):
 	if request.method == 'POST' and request.is_ajax:
 		room = get_object_or_404(Room, id = room_id)
@@ -34,6 +35,7 @@ def ajax_images_sending(request, room_id):
 			id_list.append(pict.id)
 		return JsonResponse({'id_list':id_list})
 
+@login_required
 def ajax_get_users(request, room_id):
 	if request.is_ajax:
 		room = get_object_or_404(Room, id = room_id)

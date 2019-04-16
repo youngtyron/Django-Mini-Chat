@@ -115,3 +115,6 @@
     max-height: 80%;	*/
     border-radius: 50%;
 }
+#avatar-input{
+	opacity: 0;
+}
