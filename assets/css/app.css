@@ -3,8 +3,12 @@
 	color: #FFFFFF;
 }
 .navbar-avocado{
+	position:sticky; 
+	top:10px; 
+	left;0;
 	background-color: #226E17;
 	color: #FFFFFF;
+	z-index: 99997;
 }
 .navbar-a:link {
 	color: #FFFFFF;
@@ -18,18 +22,29 @@
 .navbar-a:active {
 	color: #FFFFFF;
 }
+.left-div{
+	position: fixed;
+	margin-left: 0;
+}
+.form-div{
+/*	border: 1px solid black;
+*/	position: fixed;
+	bottom: 10px;	
+	z-index: 99997;
+	background-color: #FFFFFF;
+	opacity: 1;
+}
+.messages-div{
+/*	border: 1px solid black;
+*/	position: relative;
+	bottom: 10%;
+}
 .arrow-up-avocado{
 	color: #226E17;
 	margin-left: 1000;
 }
 .not_read{
 	background-color: #C7FCEC;
-}
-.my_message_block{
-
-}
-.anothers_message_block{
-
 }
 .message-img{
 	max-width: 90%;

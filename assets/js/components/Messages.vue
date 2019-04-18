@@ -1,65 +1,72 @@
 <template>
 	<div class="row">
 		<div class="col-4">
-			<div v-for="user in users">
-				<p>
-					<div class="chat-member-list-avatar-div">
-						<img :src="user.avatar" alt="Avatar" class="chat-member-list-avatar-img">
-					</div>
-					{{user.first_name}} {{user.last_name}}
-				</p>
-				<p v-if="user.online == true">Online</p>
+			<div class="left-div">
+				<div v-for="user in users">
+					<p>
+						<div class="chat-member-list-avatar-div">
+							<img :src="user.avatar" alt="Avatar" class="chat-member-list-avatar-img">
+						</div>
+						{{user.first_name}} {{user.last_name}}
+					</p>
+					<p v-if="user.online == true">Online</p>
+				</div>
 			</div>
 		</div>
 		<div class="col-8">
-	        <ul class="list-group">
-	        	<i class="far fa-arrow-alt-circle-up arrow-up-avocado fa-4x" @click="olderMessagesUpload" 
-	        														@mouseover="olderMessagesUpload"></i>
-		        <li class="list-group-item" 
-		        	v-bind:class="{not_read: message.not_read, my_message_block: message.mine, anothers_message_block: !message.mine}"
-		        	v-for="message in messages">
-		        	<div v-if="message.need_update" v-on:mouseover="readMessages">
-			    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
-			    		<p>{{message.text}}</p>
-			    		<p>{{message.time}}</p>
-			    		<p>{{message.date}}</p>
-			    		<div class="message-flex-img-container">
-	 	   		    		<div class="message-flex-img-row">
-			   		    		<div class="message-flex-img-col" v-for="image in message.images">
-			    					<img :src="image" class="message-img" alt="Image">
-			    				</div> 			
-		    				</div> 		 		
-			    		</div>
-		        	</div>
-		        	<div v-else>
-			    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
-			    		<p>{{message.text}}</p>
-			    		<p>{{message.time}}</p>
-			    		<p>{{message.date}}</p>
-			    		<div class="message-flex-img-container">
-	 	   		    		<div class="message-flex-img-row">
-			   		    		<div class="message-flex-img-col" v-for="image in message.images">
-			    					<img :src="image" class="message-img" alt="Image">
-			    				</div> 			
-		    				</div> 		 		
-			    		</div>
-		        	</div>
-		    	</li>
-	        </ul>
-	    	<form action="">
-	    		<div class="form-group col-md-6">
-	    			<input type="text" id="message-input" v-model="text_input" class="form-control" 
-	    												  v-on:keypress='translateTyping(); keyPressTracking(7000)'>
-	    		</div>
+			<div class="messages-div">
+				<ul class="list-group">
+		        	<i class="far fa-arrow-alt-circle-up arrow-up-avocado fa-4x" @click="olderMessagesUpload" 
+		        														@mouseover="olderMessagesUpload"></i>
+			        <li class="list-group-item" 
+			        	v-bind:class="{not_read: message.not_read, my_message_block: message.mine, anothers_message_block: !message.mine}"
+			        	v-for="message in messages">
+			        	<div class="message-exemp-div" v-if="message.need_update" v-on:mouseover="readMessages">
+				    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
+				    		<p>{{message.text}}</p>
+				    		<p>{{message.time}}</p>
+				    		<p>{{message.date}}</p>
+				    		<div class="message-flex-img-container">
+		 	   		    		<div class="message-flex-img-row">
+				   		    		<div class="message-flex-img-col" v-for="image in message.images">
+				    					<img :src="image" class="message-img" alt="Image">
+				    				</div> 			
+			    				</div> 		 		
+				    		</div>
+			        	</div>
+			        	<div class="message-exemp-div" v-else>
+				    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
+				    		<p>{{message.text}}</p>
+				    		<p>{{message.time}}</p>
+				    		<p>{{message.date}}</p>
+				    		<div class="message-flex-img-container">
+		 	   		    		<div class="message-flex-img-row">
+				   		    		<div class="message-flex-img-col" v-for="image in message.images">
+				    					<img :src="image" class="message-img" alt="Image">
+				    				</div> 			
+			    				</div> 		 		
+				    		</div>
+			        	</div>
+			    	</li>
+		        </ul>
+			</div>
+	        <div class="form-div">
+		        <form action="">
+		    		<div class="form-group col-md-6">
+		    			<input type="text" id="message-input" v-model="text_input" class="form-control" 
+		    												  v-on:keypress='translateTyping(); keyPressTracking(7000)'>
+		    		</div>
 
-	    		<div class="form-group col-md-6">
-	    			<i class="fas fa-camera-retro fa-2x avocado-icon" @click="activateImagesInput"></i>
-	    			<button type="submit" class="btn btn-avocado" @click="sendMessage">Send</button>
-	    		</div>
-			</form>
-			<form enctype="multipart/form-data" id="images-form">
-				<input type="file" id="images-input" name="images-input" v-on:change="postInputClick" class="form-control" multiple>
-			</form>
+		    		<div class="form-group col-md-6">
+		    			<i class="fas fa-camera-retro fa-2x avocado-icon" @click="activateImagesInput"></i>
+		    			<button type="submit" class="btn btn-avocado" @click="sendMessage">Send</button>
+		    		</div>
+				</form>
+				<form enctype="multipart/form-data" id="images-form">
+					<input type="file" id="images-input" name="images-input" v-on:change="postInputClick" class="form-control" multiple>
+				</form>
+	        </div>
+	    	
 			<div v-if="ImageLoadModal" class="modal-image-gallery-window text-center">
 				<div class="modal-flex-img-container">
 				  <div  v-for="i in 3" class="modal-flex-img-row">
@@ -146,6 +153,7 @@
 		    	}
 		  	});
 			window.addEventListener('keypress', this.keyListener);
+			window.addEventListener('scroll', this.scrollMessages);
 
         },
         methods: {
@@ -153,6 +161,15 @@
 				   	axios.get('/chat/get_users/' + this.room_id + '/').then((response) => {
  						this.users = response.data['users'];
                     });
+        		},
+        		scrollMessages: function(){
+        			var sctop =  document.documentElement.scrollTop;
+        			if (sctop == 0){
+	        			this.commonRoomSocket.send(JSON.stringify({
+					        'counter': this.counter,
+					        'command': 'get_messages'
+					    }));
+        			}
         		},
 		 		sendMessage: function(e){
 		 			e.preventDefault()
