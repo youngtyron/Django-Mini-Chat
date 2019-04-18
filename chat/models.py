@@ -28,6 +28,10 @@ class Room(models.Model):
 	def all_messages(self):
 		return Message.objects.filter(room = self)
 
+	def last_message_title(self, user):
+		last_message = Message.objects.filter(room = self).first()
+		return last_message.title_message_pack(user)
+
 class Message(models.Model):
 	author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messages')
 	room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='messages')
@@ -41,6 +45,36 @@ class Message(models.Model):
 
 	def __str__(self):
 		return self.author.username + ' at ' + str(self.date)
+
+	def title_message_pack(self, user):
+		if self.author == user:
+			mine = True
+		else:
+			mine = False
+		if self.text:
+			splitted_text = self.text.split(' ')
+			if len(splitted_text)<4:
+				title_text = self.text
+			else:
+				title_text = ' '.join(splitted_text[:3]) + '...'
+		else:
+			title_text = False
+		title_dict = {
+			'id': self.id,
+			'author':{'first_name':self.author.first_name, 
+					  'last_name':self.author.last_name, 
+					  'username': self.author.username, 
+					  'id': self.author.id,
+					  'avatar': self.author.avatar_url()},
+			'title_text': title_text,
+			'img_amount': len(self.image.all()),
+			'date': self.date_date_format(),
+			'time': self.date_time_format(),
+			'not_read': self.green_message_for_user(user),
+			'need_update': self.need_read_and_update(user),
+			'mine': mine
+		}	
+		return title_dict	
 
 	def date_time_format(self):
 		return str(self.date.hour) + ':' + str(self.date.minute)
