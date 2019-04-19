@@ -32,6 +32,26 @@ class Room(models.Model):
 		last_message = Message.objects.filter(room = self).first()
 		return last_message.title_message_pack(user)
 
+	def title_name(self):
+		title_name = ''
+		members = self.all_members()
+		if len(members)>3:
+			for index in range(3):
+				m = members[index]
+				title_name = title_name + m.first_name + ' ' + m.last_name
+				if (index != len(members)-1):
+					title_name = title_name + ', '
+				else:
+					title_name = title_name + '...'
+		else:
+			for index in range(len(members)):
+				m = members[index]
+				title_name = title_name + m.first_name + ' ' + m.last_name		
+				if (index != len(members)-1):
+					title_name = title_name + ', '
+		return title_name
+
+
 class Message(models.Model):
 	author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messages')
 	room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='messages')
@@ -65,7 +85,7 @@ class Message(models.Model):
 					  'last_name':self.author.last_name, 
 					  'username': self.author.username, 
 					  'id': self.author.id,
-					  'avatar': self.author.avatar_url()},
+					  'avatar': self.author.chatprofile.avatar_url()},
 			'title_text': title_text,
 			'img_amount': len(self.image.all()),
 			'date': self.date_date_format(),

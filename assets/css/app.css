@@ -22,6 +22,15 @@
 .navbar-a:active {
 	color: #FFFFFF;
 }
+.chats-list-div{
+	margin-left: 25%;
+	margin-top: 25px;
+}
+.chat-title-message-avatar-img{
+	height: 50px;
+	width: 50px;
+	border-radius: 50%;	
+}
 .left-div{
 	position: fixed;
 	margin-left: 0;

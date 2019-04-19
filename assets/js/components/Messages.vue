@@ -16,8 +16,6 @@
 		<div class="col-8">
 			<div class="messages-div">
 				<ul class="list-group">
-		        	<i class="far fa-arrow-alt-circle-up arrow-up-avocado fa-4x" @click="olderMessagesUpload" 
-		        														@mouseover="olderMessagesUpload"></i>
 			        <li class="list-group-item" 
 			        	v-bind:class="{not_read: message.not_read, my_message_block: message.mine, anothers_message_block: !message.mine}"
 			        	v-for="message in messages">
@@ -228,12 +226,6 @@
 			              this.sendMessage(e)
 			            }
 		 			}
-		 		},
-		 		olderMessagesUpload: function(){
-		 			this.commonRoomSocket.send(JSON.stringify({
-				        'counter': this.counter,
-				        'command': 'get_messages'
-				    }));
 		 		},
 		 		readMessages: function(){
 	 				this.commonRoomSocket.send(JSON.stringify({

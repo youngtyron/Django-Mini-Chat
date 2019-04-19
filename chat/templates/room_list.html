@@ -1,12 +1,38 @@
 {% extends 'base.html' %}
 
 {% block content %}
+	<div class="row">
+		<div class='col-8 chats-list-div'>
+			<ul class="list-group">
+			{% for room in rooms %}
+				<li class="list-group-item">		
+				  	<a href="{% url 'chat:room' room.id %}"><p>{{room.title_name}}</p></a>
+				  	{% if room.last_message_title.not_read %}
+					  	<div class="not_read">
+							<p>
+							<div class="chat-member-list-avatar-div">
+								<img src="{{room.last_message_title.author.avatar}}" alt="Avatar" class="chat-title-message-avatar-img">
+							</div>
+							{{room.last_message_title.author.first_name}} {{room.last_message_title.author.last_name}}
+							</p>
+							<p>{{room.last_message_title.title_text}}</p>
+					  	</div>
+				  	{% else %}
+					  	<div>
+							<p>
+							<div class="chat-member-list-avatar-div">
+								<img src="{{room.last_message_title.author.avatar}}" alt="Avatar" class="chat-title-message-avatar-img">
+							</div>
+							{{room.last_message_title.author.first_name}} {{room.last_message_title.author.last_name}}
+							</p>
+							<p>{{room.last_message_title.title_text}}</p>
+					  	</div>
+				  	{% endif %}
 
-	{% for room in room_list %}
-	  <a href="{% url 'chat:room' room.id %}">ROOM</a>
-		{% for member in room.all_members %}
-			<p>{{member.first_name}} {{member.last_name}}</p>
-		{% endfor %}
-	{% endfor %}
 
+				</li>
+			{% endfor %}
+			</ul>
+		</div>
+	</div>
 {% endblock %}

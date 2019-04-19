@@ -1,21 +1,28 @@
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
+from django.views.generic.base import TemplateView
 from chat.models import Room, MessageImage
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.http import JsonResponse, HttpResponse
 from django.core.cache import cache
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.decorators import login_required
-# from chat.consumers import CommonRoomConsumer
 
-class RoomListView(ListView):
+
+class AllRoomsView(TemplateView):
 	template_name = 'room_list.html'
-	model = Room
 
-	def get_queryset(self):
-		rooms = Room.objects.filter(member = self.request.user)
-		return rooms
+	def get_context_data(self, **kwargs):
+	    context = super().get_context_data(**kwargs)
+	    context ['rooms'] = list()
+	    rooms = Room.objects.filter(member = self.request.user)
+	    for room in rooms:
+	    	context ['rooms'].append({'id': room.id, 
+	    							  'title_name': room.title_name(),
+	    							  'all_members': room.all_members(), 
+	    							  'last_message_title': room.last_message_title(self.request.user)})
+	    return context
 
 class RoomDetailView(DetailView):
 	template_name = 'messages_list.html'

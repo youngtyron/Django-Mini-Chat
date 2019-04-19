@@ -48,10 +48,8 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
             counter = data['counter']
             await self.read_messages(counter)
         elif data['command'] == 'typing':
-            print('command typing')
             await self.typing_translate()
         elif data['command'] == 'stoptyping':
-            print('command stoptyping')
             await self.stoptyping_translate()
 
     @database_sync_to_async
