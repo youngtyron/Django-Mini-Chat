@@ -41,7 +41,7 @@ class EditProfile(TemplateView, LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['avatar'] = [self.request.user.chatprofile.avatar.url]
+        context['avatar'] = [self.request.user.chatprofile.avatar_url()]
         context['user'] = self.request.user
         return context
 
@@ -85,6 +85,7 @@ class RegistrationView(FormView):
                                         password = password,
                                         first_name = first_name,
                                         last_name = last_name)
+        ChatProfile.objects.create(user = user)
         auth_login(self.request, user)
         cache.add('user_online_' + str(self.request.user.id), True, 999999)
         return super(RegistrationView, self).form_valid(form)

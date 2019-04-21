@@ -7,28 +7,33 @@
 			{% for room in rooms %}
 				<li class="list-group-item">		
 				  	<a href="{% url 'chat:room' room.id %}"><p>{{room.title_name}}</p></a>
-				  	{% if room.last_message_title.not_read %}
-					  	<div class="not_read">
-							<p>
-							<div class="chat-member-list-avatar-div">
-								<img src="{{room.last_message_title.author.avatar}}" alt="Avatar" class="chat-title-message-avatar-img">
-							</div>
-							{{room.last_message_title.author.first_name}} {{room.last_message_title.author.last_name}}
-							</p>
-							<p>{{room.last_message_title.title_text}}</p>
-					  	</div>
-				  	{% else %}
-					  	<div>
-							<p>
-							<div class="chat-member-list-avatar-div">
-								<img src="{{room.last_message_title.author.avatar}}" alt="Avatar" class="chat-title-message-avatar-img">
-							</div>
-							{{room.last_message_title.author.first_name}} {{room.last_message_title.author.last_name}}
-							</p>
-							<p>{{room.last_message_title.title_text}}</p>
-					  	</div>
-				  	{% endif %}
-
+				  	{% if room.last_message %}
+					  	{% if room.last_message_title.not_read %}
+						  	<div class="not_read">
+								<p>
+								<div class="chat-member-list-avatar-div">
+									<img src="{{room.last_message_title.author.avatar}}" alt="Avatar" class="chat-title-message-avatar-img">
+								</div>
+								{{room.last_message_title.author.first_name}} {{room.last_message_title.author.last_name}}
+								</p>
+								<p>{{room.last_message_title.title_text}}</p>
+						  	</div>
+					  	{% else %}
+						  	<div>
+								<p>
+								<div class="chat-member-list-avatar-div">
+									<img src="{{room.last_message_title.author.avatar}}" alt="Avatar" class="chat-title-message-avatar-img">
+								</div>
+								{{room.last_message_title.author.first_name}} {{room.last_message_title.author.last_name}}
+								</p>
+								<p>{{room.last_message_title.title_text}}</p>
+						  	</div>
+					  	{% endif %}
+					{% else %}
+						  	<div>
+								<p>There is not any messages</p>
+						  	</div>						
+					{% endif %}
 
 				</li>
 			{% endfor %}

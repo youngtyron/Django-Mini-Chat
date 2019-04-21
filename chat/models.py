@@ -14,7 +14,7 @@ class ChatProfile(models.Model):
 		if self.avatar:
 			return self.avatar.url
 		else:
-			return False
+			return '/static/service/avatar.jpg'
 
 class Room(models.Model):
 	member = models.ManyToManyField(User)
@@ -30,7 +30,10 @@ class Room(models.Model):
 
 	def last_message_title(self, user):
 		last_message = Message.objects.filter(room = self).first()
-		return last_message.title_message_pack(user)
+		if last_message != None:
+			return last_message.title_message_pack(user)
+		else:
+			return False
 
 	def title_name(self):
 		title_name = ''
