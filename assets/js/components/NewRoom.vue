@@ -1,6 +1,21 @@
 <template>
 	<div class="row" style="margin-top: 10px;">	
-		<div class='col-6'>
+        <div class="col-4">
+            <ul class="list-group">
+                <li class="list-group-item" v-for="added in added_users">
+                    <p>
+                        <div class="matched-users-avatar-div">
+                            <img :src="added.avatar" alt="Avatar" class="matched-users-avatar-img">
+                        </div>
+                        {{added.first_name}} {{added.last_name}}
+                        <i class="fas fa-times fa-2x cross-added-users" v-on:mouseover="emphasizeCross($event)"
+                                                                        v-on:mouseout="hideCross($event)"
+                                                                        @click='removeAdded(added)'></i>
+                    </p>
+                </li>
+            </ul>
+        </div>
+		<div class='col-8'>
 			<div class="user-search-div">
                 <form action="">
                     <div class="form-group col-md-6">
@@ -11,7 +26,7 @@
                 </form>
                 <div>
                     <ul class="list-group">
-                        <li class="list-group-item" v-for="matched in matched_users">
+                        <li class="list-group-item" v-for="matched in matched_users" @click='addUser(matched)'>
                             <p>
                                 <div class="matched-users-avatar-div">
                                     <img :src="matched.avatar" alt="Avatar" class="matched-users-avatar-img">
@@ -23,9 +38,6 @@
                 </div>
             </div>
 		</div>
-        <div class="col-6">
-            
-        </div>
     </div>
 </template>
 
@@ -35,6 +47,7 @@
             return  {
                 search_text: '',
                 matched_users: [],
+                added_users: [],
             }
         },
         mounted() {
@@ -46,10 +59,26 @@
                     axios.post('/chat/search_users/', data)
                         .then((response) => {
                             this.matched_users = response.data['matched_users']
-                            console.log(response.data)
                         }).catch((error)=>{
                             console.log(error)
                         });
+                },
+                addUser: function(choosen){
+                    if (this.added_users.indexOf(choosen) != -1){
+                        alert("You've added this user already")
+                    }
+                    else{
+                        this.added_users = this.added_users.concat(choosen)
+                    }
+                },
+                emphasizeCross: function($event){
+                    $event.target.style.opacity = '1';
+                },
+                hideCross: function($event){
+                    $event.target.style.opacity = '0.3';
+                },
+                removeAdded: function(added){
+                    this.added_users.splice(this.added_users.indexOf(added), 1);
                 }
             }      
         };
