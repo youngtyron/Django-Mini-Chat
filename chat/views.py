@@ -8,23 +8,17 @@ from django.core.cache import cache
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
+from django.contrib.auth.models import User
 
-
-class AllRoomsView(TemplateView):
+class AllRoomsView(TemplateView, LoginRequiredMixin):
 	template_name = 'room_list.html'
 
-	def get_context_data(self, **kwargs):
-	    context = super().get_context_data(**kwargs)
-	    context ['rooms'] = list()
-	    rooms = Room.objects.filter(member = self.request.user)
-	    for room in rooms:
-	    	context ['rooms'].append({'id': room.id, 
-	    							  'title_name': room.title_name(),
-	    							  'all_members': room.all_members(), 
-	    							  'last_message_title': room.last_message_title(self.request.user)})
-	    return context
+class NewRoomView(TemplateView, LoginRequiredMixin):
+	template_name = 'new_room.html'
 
-class RoomDetailView(DetailView):
+class RoomDetailView(DetailView, LoginRequiredMixin):
 	template_name = 'messages_list.html'
 
 	def get_object(self, **kwargs):
@@ -56,10 +50,34 @@ def ajax_get_users(request, room_id):
 						'last_name': user.last_name, 
 						'online': online, 
 						'id': user.id,
-						'avatar': user.chatprofile.avatar.url}
+						'avatar': user.chatprofile.avatar_url()}
 			users_list.append(user_dict)
 		return JsonResponse({'users': users_list})
 
+@login_required
+def ajax_get_rooms(request):
+	if request.is_ajax:
+		rooms = Room.objects.filter(member = request.user)
+		rooms_list = list()
+		for room in rooms:
+			room_dict = {'id': room.id, 
+	    				 'title_name': room.title_name(),
+	    				 'all_members': room.all_members_list(), 
+	    				 'last_message_title': room.last_message_title(request.user)
+			}
+			rooms_list.append(room_dict)
+		return JsonResponse({'rooms': rooms_list})
+
+@login_required
+def ajax_search_users(request):
+	if request.is_ajax:
+		searchText = request.POST['search']
+		matched_users = User.objects.filter(Q(first_name__contains = searchText) | Q (last_name__contains = searchText))
+		print(matched_users)
+		users_list = list()
+		for user in matched_users:
+			users_list.append(user.chatprofile.user_dict())
+		return JsonResponse({'matched_users': users_list})
 
 def become_online_chat_announcement(user):
     rooms = Room.objects.filter(member = user)

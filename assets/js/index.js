@@ -13,13 +13,17 @@ window.axios.defaults.headers.common = {
 import Vue from 'vue';
 
 import Messages from "./components/Messages.vue";
+import Rooms from "./components/Rooms.vue";
 import EditProfile from "./components/EditProfile.vue";
+import NewRoom from "./components/NewRoom.vue";
 
 
 const app = new Vue({
     el: '#app',
     components: {
         Messages, 
-        EditProfile
+        EditProfile,
+        Rooms,
+        NewRoom
     }
 });

@@ -16,6 +16,10 @@ class ChatProfile(models.Model):
 		else:
 			return '/static/service/avatar.jpg'
 
+	def user_dict(self):
+		user_dict = {'first_name': self.user.first_name, 'last_name': self.user.last_name, 'avatar': self.avatar_url()}
+		return user_dict
+
 class Room(models.Model):
 	member = models.ManyToManyField(User)
 
@@ -24,6 +28,17 @@ class Room(models.Model):
 
 	def all_members(self):
 		return self.member.all()
+
+	def all_members_list(self):
+		ms = self.all_members()
+		ms_list = list()
+		for m in ms:
+			m_dict = {
+				'first_name': m.first_name,
+				'last_name': m.last_name
+			}
+			ms_list.append(m_dict)
+		return ms_list
 
 	def all_messages(self):
 		return Message.objects.filter(room = self)

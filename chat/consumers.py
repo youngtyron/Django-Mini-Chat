@@ -66,17 +66,36 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
                 message.image.add(image)
         message.had_read.add(user)
         message.save()
+        print("___________________________________")
+        print("___________________________________")
+        print("___________________________________")
         for addressee in room.all_members():
+            print('ADDRESSEE: '+ addressee.username)
             cache_key = 'chat_%s_user_%s' % (self.room_id, addressee.id)
             addressee_channel_name = cache.get(cache_key)
-            async_to_sync(self.channel_layer.send)(
-                addressee_channel_name,
-                    {
-                        'type': 'transmit_message',
-                        'new_message': message.packed_dict(addressee),
-                    }
-            )
- 
+            if addressee_channel_name != None:
+                print('addressee_channel_name:'+ addressee_channel_name)
+                async_to_sync(self.channel_layer.send)(
+                    addressee_channel_name,
+                        {
+                            'type': 'transmit_message',
+                            'new_message': message.packed_dict(addressee),
+                        }
+                )
+            print("GETTING NOTIF CHANNELS")
+            # notif_cache_key = 'notif_user_%s' % addressee.id
+            # notif_channel_name = cache.get(notif_cache_key)
+            # if notif_channel_name != None:
+            #     print('NAME:'+notif_channel_name)
+        channel_layer = get_channel_layer()
+        channel_layer.group_send(
+            'notifications',
+                {
+                    'type': 'message_notif',
+                    'new_message': 'hello',
+                }
+        )
+
     async def transmit_message(self, event):
         message = event['new_message']
         await self.send(text_data=json.dumps({
