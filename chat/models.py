@@ -1,6 +1,8 @@
 import calendar
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
 
 class ChatProfile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -106,14 +108,21 @@ class Message(models.Model):
 					  'avatar': self.author.chatprofile.avatar_url()},
 			'title_text': title_text,
 			'img_amount': len(self.image.all()),
-			'date': self.date_date_format(),
-			'time': self.date_time_format(),
+			'date': self.final_date_format(),
 			'not_read': self.green_message_for_user(user),
 			'need_update': self.need_read_and_update(user),
 			'mine': mine
 		}	
 		return title_dict	
 
+	def final_date_format(self):
+		one_day = timedelta(days = 1)
+		now = timezone.now()
+		if self.date < now - one_day:
+			return self.date_date_format()
+		else:
+			return self.date_time_format()
+ 
 	def date_time_format(self):
 		return str(self.date.hour) + ':' + str(self.date.minute)
 
@@ -134,8 +143,7 @@ class Message(models.Model):
 			'id': self.id,
 			'author':{'first_name':self.author.first_name, 'last_name':self.author.last_name, 'username': self.author.username, 'id': self.author.id},
 			'text': self.text,
-			'date': self.date_date_format(),
-			'time': self.date_time_format(),
+			'date': self.final_date_format(),
 			'images': images_pack,
 			'not_read': self.green_message_for_user(user),
 			'need_update': self.need_read_and_update(user),

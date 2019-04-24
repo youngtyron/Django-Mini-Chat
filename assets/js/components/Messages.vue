@@ -16,34 +16,34 @@
 		<div class="col-8">
 			<div class="messages-div">
 				<ul class="list-group">
-			        <li class="list-group-item" 
+			        <li class="list-group-item message-cloud-li" 
 			        	v-bind:class="{not_read: message.not_read, my_message_block: message.mine, anothers_message_block: !message.mine}"
 			        	v-for="message in messages">
-			        	<div class="message-exemp-div" v-if="message.need_update" v-on:mouseover="readMessages">
-				    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
-				    		<p>{{message.text}}</p>
-				    		<p>{{message.time}}</p>
-				    		<p>{{message.date}}</p>
-				    		<div class="message-flex-img-container">
-		 	   		    		<div class="message-flex-img-row">
-				   		    		<div class="message-flex-img-col" v-for="image in message.images">
-				    					<img :src="image" class="message-img" alt="Image">
-				    				</div> 			
-			    				</div> 		 		
-				    		</div>
-			        	</div>
-			        	<div class="message-exemp-div" v-else>
-				    		<p>{{message.author.first_name}} {{message.author.last_name}}</p>
-				    		<p>{{message.text}}</p>
-				    		<p>{{message.time}}</p>
-				    		<p>{{message.date}}</p>
-				    		<div class="message-flex-img-container">
-		 	   		    		<div class="message-flex-img-row">
-				   		    		<div class="message-flex-img-col" v-for="image in message.images">
-				    					<img :src="image" class="message-img" alt="Image">
-				    				</div> 			
-			    				</div> 		 		
-				    		</div>
+			        	<div class="message-cloud-div">
+				        	<div class="message-exemp-div" v-if="message.need_update" v-on:mouseover="readMessages">
+					    		<p>{{message.author.first_name}}</p>
+					    		<p>{{message.text}}</p>
+					    		<p>{{message.date}}</p>
+					    		<div class="message-flex-img-container">
+			 	   		    		<div class="message-flex-img-row">
+					   		    		<div class="message-flex-img-col" v-for="image in message.images">
+					    					<img :src="image" class="message-img" alt="Image">
+					    				</div> 			
+				    				</div> 		 		
+					    		</div>
+				        	</div>
+				        	<div class="message-exemp-div" v-else>
+					    		<p>{{message.author.first_name}}</p>
+					    		<p>{{message.text}}</p>
+					    		<p>{{message.date}}</p>
+					    		<div class="message-flex-img-container">
+			 	   		    		<div class="message-flex-img-row">
+					   		    		<div class="message-flex-img-col" v-for="image in message.images">
+					    					<img :src="image" class="message-img" alt="Image">
+					    				</div> 			
+				    				</div> 		 		
+					    		</div>
+				        	</div>			        		
 			        	</div>
 			    	</li>
 		        </ul>
