@@ -17,7 +17,7 @@ class ChatProfile(models.Model):
 			return '/static/service/avatar.jpg'
 
 	def user_dict(self):
-		user_dict = {'first_name': self.user.first_name, 'last_name': self.user.last_name, 'avatar': self.avatar_url()}
+		user_dict = {'id': self.user.id, 'first_name': self.user.first_name, 'last_name': self.user.last_name, 'avatar': self.avatar_url()}
 		return user_dict
 
 class Room(models.Model):

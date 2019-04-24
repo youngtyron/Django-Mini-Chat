@@ -14,6 +14,7 @@
                     </p>
                 </li>
             </ul>
+            <button v-if="added_users.length > 0" class="btn btn-avocado" @click='createChat' type="button">Create chat</button>
         </div>
 		<div class='col-8'>
 			<div class="user-search-div">
@@ -68,7 +69,7 @@
                         alert("You've added this user already")
                     }
                     else{
-                        this.added_users = this.added_users.concat(choosen)
+                        this.added_users.push(choosen)
                     }
                 },
                 emphasizeCross: function($event){
@@ -79,6 +80,22 @@
                 },
                 removeAdded: function(added){
                     this.added_users.splice(this.added_users.indexOf(added), 1);
+                },
+                createChat: function(){
+                    var ids = new Array()
+                    for (var i = 0; i < this.added_users.length; i++) {
+                        ids.push(this.added_users[i].id)
+                    }
+                    this.added_users = []
+                    var data = new URLSearchParams();
+                    data.append('ids', ids);
+                    axios.post('/chat/create_chat/', data)
+                        .then((response) => {
+                            var url = window.location.origin + '/chat/room/' + response.data['room_id'];
+                            window.location.href= url;
+                        }).catch((error)=>{
+                            console.log(error)
+                        });
                 }
             }      
         };

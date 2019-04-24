@@ -54,6 +54,7 @@ def ajax_get_users(request, room_id):
 			users_list.append(user_dict)
 		return JsonResponse({'users': users_list})
 
+
 @login_required
 def ajax_get_rooms(request):
 	if request.is_ajax:
@@ -72,12 +73,22 @@ def ajax_get_rooms(request):
 def ajax_search_users(request):
 	if request.is_ajax:
 		searchText = request.POST['search']
-		matched_users = User.objects.filter(Q(first_name__contains = searchText) | Q (last_name__contains = searchText))
-		print(matched_users)
+		matched_users = User.objects.filter(Q(first_name__contains = searchText) | Q (last_name__contains = searchText)).exclude(id = request.user.id)
+		# print(matched_users)
 		users_list = list()
 		for user in matched_users:
 			users_list.append(user.chatprofile.user_dict())
 		return JsonResponse({'matched_users': users_list})
+
+@login_required
+def ajax_create_chat(request):
+	if request.is_ajax:
+		room = Room.objects.create()
+		id_list = request.POST['ids'].split(',')
+		for one_id in id_list:
+			member = get_object_or_404(User, id = one_id)
+			room.member.add(member)
+		return JsonResponse({'room_id': room.id})
 
 def become_online_chat_announcement(user):
     rooms = Room.objects.filter(member = user)

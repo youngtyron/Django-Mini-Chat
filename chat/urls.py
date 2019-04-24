@@ -12,5 +12,5 @@ urlpatterns = [
 	path('get_users/<int:room_id>/', views.ajax_get_users),
 	path('get_rooms/', views.ajax_get_rooms),
 	path('search_users/', views.ajax_search_users),
-
+	path('create_chat/', views.ajax_create_chat),
 ]
