@@ -63,6 +63,7 @@
 				<form enctype="multipart/form-data" id="images-form">
 					<input type="file" id="images-input" name="images-input" v-on:change="postInputClick" class="form-control" multiple>
 				</form>
+				<p v-model='typing_notif'>{{typing_notif}}</p>
 	        </div>
 	    	
 			<div v-if="ImageLoadModal" class="modal-image-gallery-window text-center">
@@ -93,6 +94,8 @@
             	counter: 0,
             	ImagesFormData: null,
             	ImageLoadModal: false,
+            	typers: [],
+            	typing_notif: '',
             }
         },
         mounted() {
@@ -127,11 +130,43 @@
 		    	}
 		    	else if (data['user_is_typing']){
 			    	var user_name = data['user_is_typing'];
-			    	console.log(user_name + ' type a message...')
+			    	if(this.typers.indexOf(user_name)==-1){
+			    		this.typers.push(user_name);
+			    		this.typing_notif =  '';
+				    	for (var i = 0; i < this.typers.length; i++) {
+				    		if (i!= this.typers.length-1){
+				    			this.typing_notif = this.typing_notif + this.typers[i] + ', '
+				    		}
+				    		else{
+				    			this.typing_notif = this.typing_notif + this.typers[i]
+				    		}
+				    	}
+				    	if (this.typers.length == 1){
+				    		this.typing_notif = this.typing_notif + ' types a message...'
+				    	}
+				    	else if (this.typers.length>1){
+				    		this.typing_notif = this.typing_notif + ' type a message...'
+				    	}			    		
+			    	}
 		    	}
 		    	else if (data['user_stopped_typing']){
 			    	var user_name = data['user_stopped_typing'];
-			    	console.log(user_name + ' stopped typing.')
+			    	this.typers.splice(this.typers.indexOf(user_name), 1);
+	    			this.typing_notif =  '';
+				    for (var i = 0; i < this.typers.length; i++) {
+			    		if (i!= this.typers.length-1){
+			    			this.typing_notif = this.typing_notif + this.typers[i] + ', '
+			    		}
+			    		else{
+			    			this.typing_notif = this.typing_notif + this.typers[i]
+			    		}
+				    }
+			    	if (this.typers.length == 1){
+			    		this.typing_notif = this.typing_notif + ' types a message...'
+			    	}
+			    	else if (this.typers.length>1){
+			    		this.typing_notif = this.typing_notif + ' type a message...'
+			    	}	
 		    	}
 		    	else if (data['user_become_online']){
 					for (var i = 0; i < this.users.length; i++) {
