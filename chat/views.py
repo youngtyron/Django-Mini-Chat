@@ -81,6 +81,18 @@ def ajax_search_users(request):
 		return JsonResponse({'matched_users': users_list})
 
 @login_required
+def ajax_potential_members(request, room_id):
+	if request.is_ajax:
+		room = get_object_or_404(Room, id = room_id)
+		searchMember = request.POST['search']
+		matched = User.objects.filter(Q(first_name__contains = searchMember) | Q (last_name__contains = searchMember)).exclude(id = request.user.id)
+		potential_members = list()
+		for m in matched:
+			if m not in room.all_members():
+				potential_members.append(m.chatprofile.user_dict())
+		return JsonResponse({'potential_members': potential_members})
+
+@login_required
 def ajax_create_chat(request):
 	if request.is_ajax:
 		room = Room.objects.create()
@@ -89,6 +101,17 @@ def ajax_create_chat(request):
 			member = get_object_or_404(User, id = one_id)
 			room.member.add(member)
 		return JsonResponse({'room_id': room.id})
+
+@login_required
+def ajax_add_member(request, room_id):
+	if request.is_ajax:
+		room = get_object_or_404(Room, id = room_id)
+		member_id = request.POST['new_member']
+		new_member = get_object_or_404(User, id = member_id)
+		room.member.add(new_member)
+		room.save()
+		new_member_dict = new_member.chatprofile.user_dict()
+		return JsonResponse({'new_member': new_member_dict})
 
 def become_online_chat_announcement(user):
     rooms = Room.objects.filter(member = user)

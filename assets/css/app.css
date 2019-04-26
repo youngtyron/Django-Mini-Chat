@@ -42,12 +42,14 @@
 	z-index: 99997;
 	background-color: #FFFFFF;
 	opacity: 1;
+	width: inherit;
 }
-.messages-div{
+.messages-block{
 /*	border: 1px solid black;
-*/	position: relative;
-	bottom: 10%;
-}
+*/	
+/*	position: relative;
+/**/	bottom: 10%;
+*/}
 .not_read{
 	background-color: #C7FCEC;
 }
@@ -122,12 +124,7 @@
 	width: 100px;
 	border-radius: 50%;
 }
-.chat-member-list-avatar-div{
-}
-.edit-profile-avatar-div{
-/*	width: 45%;
-	height: 45%;	*/
-}
+
 #edit-profile-avatar-img{
 	width: 250px;
 	height: 250px;	
@@ -136,9 +133,6 @@
 #avatar-input{
 	opacity: 0;
 }
-.matched-users-avatar-div{
-}
-
 .matched-users-avatar-img{
 	height: 75px;
 	width: 75px;
@@ -148,10 +142,45 @@
 	opacity: 0.3;
 	vertical-align: center;
 }
-.message-exemp-div{
-/*	max-width: 95%;
-*/
+.above-chat-block{
+	position: fixed;
+/*s*/	top: 6.5%;
+	z-index: 99997;
+	background-color: #FFFFFF;
+	opacity: 1;
+	width: inherit;
+	height: 10%;
+	border: 1px solid red;
 }
-.message-cloud-li{
-/*	border: 1px solid black;
-*/}
+.modal-add-member-window{
+	border: 1px solid black;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	background-color: #FFFFFF;
+	position: fixed;
+	height: 60%;
+	width: 50%;
+	vertical-align: middle;
+	text-align: center;
+	z-index: 99998;
+	margin: 10% auto;	
+	overflow: scroll;
+}
+.add-member-form{
+	position: fixed;
+	z-index: 99999;
+	width: inherit;
+	height: 10%;
+	background-color: #FFFFFF;
+	opacity: 1;
+	margin: 0 auto;	
+}
+.add-member-input{
+  margin-left: auto;
+  margin-right: auto;
+}
+.no-one-found{
+	margin: 0 auto;	
+}

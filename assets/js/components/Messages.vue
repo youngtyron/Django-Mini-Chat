@@ -14,13 +14,17 @@
 			</div>
 		</div>
 		<div class="col-8">
-			<div class="messages-div">
+			<div class="above-chat-block">
+				<button class="btn btn-avocado" type='button' @click='leaveChat'>Leave chat</button>
+				<button class="btn btn-avocado" type='button' @click='openAddMember'>Add chat member</button>
+			</div>
+			<div class="messages-block">
 				<ul class="list-group">
+					<p v-for="i in 10"></p>
 			        <li class="list-group-item message-cloud-li" 
 			        	v-bind:class="{not_read: message.not_read, my_message_block: message.mine, anothers_message_block: !message.mine}"
 			        	v-for="message in messages">
-			        	<div class="message-cloud-div">
-				        	<div class="message-exemp-div" v-if="message.need_update" v-on:mouseover="readMessages">
+			        	<div class="message-exemp-div" v-if="message.need_update" v-on:mouseover="readMessages">
 					    		<p>{{message.author.first_name}}</p>
 					    		<p>{{message.text}}</p>
 					    		<p>{{message.date}}</p>
@@ -31,28 +35,28 @@
 					    				</div> 			
 				    				</div> 		 		
 					    		</div>
-				        	</div>
-				        	<div class="message-exemp-div" v-else>
-					    		<p>{{message.author.first_name}}</p>
-					    		<p>{{message.text}}</p>
-					    		<p>{{message.date}}</p>
-					    		<div class="message-flex-img-container">
-			 	   		    		<div class="message-flex-img-row">
-					   		    		<div class="message-flex-img-col" v-for="image in message.images">
-					    					<img :src="image" class="message-img" alt="Image">
-					    				</div> 			
-				    				</div> 		 		
-					    		</div>
-				        	</div>			        		
+				        </div>
+				        <div class="message-exemp-div" v-else>
+				    		<p>{{message.author.first_name}}</p>
+				    		<p>{{message.text}}</p>
+				    		<p>{{message.date}}</p>
+				    		<div class="message-flex-img-container">
+		 	   		    		<div class="message-flex-img-row">
+				   		    		<div class="message-flex-img-col" v-for="image in message.images">
+				    					<img :src="image" class="message-img" alt="Image">
+				    				</div> 			
+			    				</div> 		 		
+				    		</div>
 			        	</div>
-			    	</li>
+				   	</li>
 		        </ul>
 			</div>
 	        <div class="form-div">
 		        <form action="">
-		    		<div class="form-group col-md-6">
+		    		<div class="form-group">
 		    			<input type="text" id="message-input" v-model="text_input" class="form-control" 
-		    												  v-on:keypress='translateTyping(); keyPressTracking(7000)'>
+		    												  v-on:keypress='translateTyping(); keyPressTracking(7000)'
+		    												  style="">
 		    		</div>
 
 		    		<div class="form-group col-md-6">
@@ -76,6 +80,29 @@
 				</div>
 				<button id="attach-images-button" class="btn btn-avocado" type="button" @click="attachImages">Attach</button>
 			</div>
+
+			<div v-if="addMemberModal" class="modal-add-member-window text-center">
+				<form action="" class="add-member-form">
+                    <div class="form-group col-md-6 add-member-input">
+                        <label for="userSearchInput">Type user name here</label>
+                        <input type="text" id="memberSearchInput" v-model="search_member" class="form-control" 
+                                                              v-on:keypress='findMemberOnTyping'>
+                    </div>
+                </form>
+                <div  v-if='potential_members.length>0'>
+                    <ul class="list-group">
+                        <li class="list-group-item" v-for="potential in potential_members" @click='addMember(potential.id)'>
+                            <p>
+                                <div class="matched-users-avatar-div">
+                                    <img :src="potential.avatar" alt="Avatar" class="matched-users-avatar-img">
+                                </div>
+                                {{potential.first_name}} {{potential.last_name}}
+                            </p>
+                        </li>
+                    </ul>
+                </div>
+			</div>
+
 		</div>
     </div>
 </template>
@@ -96,6 +123,9 @@
             	ImageLoadModal: false,
             	typers: [],
             	typing_notif: '',
+            	addMemberModal: null,
+            	potential_members: [],
+            	search_member: '',
             }
         },
         mounted() {
@@ -196,6 +226,7 @@
                     });
         		},
         		scrollMessages: function(){
+        			console.log('scroll')
         			var sctop =  document.documentElement.scrollTop;
         			if (sctop == 0){
 	        			this.commonRoomSocket.send(JSON.stringify({
@@ -323,6 +354,36 @@
 	 				this.commonRoomSocket.send(JSON.stringify({
 			   			'command': 'typing'
 			        }));
+		 		},
+		 		leaveChat: function(){
+		 			console.log('leaveChat')
+		 		},
+		 		openAddMember: function(){
+		 			console.log('addMember')
+		 			this.addMemberModal = true;
+		 		},
+		 		findMemberOnTyping: function(){
+		 			var data = new URLSearchParams();
+                    data.append('search', this.search_member);
+                    axios.post('/chat/potential_members/' + this.room_id + '/', data)
+                        .then((response) => {
+	 						this.potential_members = response.data['potential_members'];
+	 						console.log(this.potential_members)
+                        }).catch((error)=>{
+                            console.log(error)
+                        });
+		 		},
+		 		addMember: function(potential_id){
+		 			console.log(potential_id)
+		 			var data = new URLSearchParams();
+                    data.append('new_member', potential_id);
+		 		    axios.post('/chat/add_member/' + this.room_id + '/', data)
+                        .then((response) => {
+                        	console.log(response.data['new_member'])
+                        	this.users.push(response.data['new_member'])
+                        }).catch((error)=>{
+                            console.log(error)
+                        });
 		 		}
             }      
         };
