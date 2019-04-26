@@ -123,7 +123,7 @@
             	ImageLoadModal: false,
             	typers: [],
             	typing_notif: '',
-            	addMemberModal: null,
+            	addMemberModal: false,
             	potential_members: [],
             	search_member: '',
             }
@@ -213,6 +213,18 @@
 							break;
 						}
 					}
+		    	}
+		    	else if (data['new_member']){
+					this.users.push(data['new_member']);
+		    	}
+		    	else if (data['leave_chat']){
+		    		for (var i = 0; i < this.users.length; i++) {
+		    			if (this.users[i].id == data['leave_chat'].id){
+		    				this.users.splice(i, 1);
+		    				break;
+		    			}
+		    		}
+					alert(data['leave_chat'].first_name + ' ' + data['leave_chat'].last_name + ' left this chat');
 		    	}
 		  	});
 			window.addEventListener('keypress', this.keyListener);
@@ -357,6 +369,10 @@
 		 		},
 		 		leaveChat: function(){
 		 			console.log('leaveChat')
+   					this.commonRoomSocket.send(JSON.stringify({
+			            'command': 'leave_chat'
+			        }));	
+                    window.location.href= window.location.origin;
 		 		},
 		 		openAddMember: function(){
 		 			console.log('addMember')
@@ -374,17 +390,12 @@
                         });
 		 		},
 		 		addMember: function(potential_id){
-		 			console.log(potential_id)
-		 			var data = new URLSearchParams();
-                    data.append('new_member', potential_id);
-		 		    axios.post('/chat/add_member/' + this.room_id + '/', data)
-                        .then((response) => {
-                        	console.log(response.data['new_member'])
-                        	this.users.push(response.data['new_member'])
-                        }).catch((error)=>{
-                            console.log(error)
-                        });
-		 		}
+					this.commonRoomSocket.send(JSON.stringify({
+			            'potential_id': potential_id,
+			            'command': 'new_member'
+			        }));	
+			        this.addMemberModal = false
+		 		},
             }      
         };
 </script>

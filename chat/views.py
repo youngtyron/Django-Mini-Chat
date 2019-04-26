@@ -102,16 +102,6 @@ def ajax_create_chat(request):
 			room.member.add(member)
 		return JsonResponse({'room_id': room.id})
 
-@login_required
-def ajax_add_member(request, room_id):
-	if request.is_ajax:
-		room = get_object_or_404(Room, id = room_id)
-		member_id = request.POST['new_member']
-		new_member = get_object_or_404(User, id = member_id)
-		room.member.add(new_member)
-		room.save()
-		new_member_dict = new_member.chatprofile.user_dict()
-		return JsonResponse({'new_member': new_member_dict})
 
 def become_online_chat_announcement(user):
     rooms = Room.objects.filter(member = user)

@@ -4,9 +4,9 @@ from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
-
+from django.shortcuts import get_object_or_404
 from django.core.cache import cache
-
+from django.contrib.auth.models import User
 from chat.models import Message, Room, MessageImage
 
 class CommonRoomConsumer(AsyncWebsocketConsumer):
@@ -51,6 +51,11 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
             await self.typing_translate()
         elif data['command'] == 'stoptyping':
             await self.stoptyping_translate()
+        elif data['command'] == 'new_member':
+            potential_id = data['potential_id']
+            await self.add_new_member(potential_id)
+        elif data['command'] == 'leave_chat':
+            await self.leave_chat()
 
     @database_sync_to_async
     def create_message(self, text_message, images_id_list):
@@ -197,4 +202,50 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         user_data = event['user_data']
         await self.send(text_data=json.dumps({
             'user_become_offline': user_data,
+        }))
+
+    @database_sync_to_async
+    def add_new_member(self, potential_id):
+        room = Room.objects.get(id = self.room_id)
+        user = self.scope["user"]
+        new_member = get_object_or_404(User, id = potential_id)
+        room.member.add(new_member)
+        room.save()
+        new_member_dict = new_member.chatprofile.user_dict()
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+                {
+                    'type': 'return_new_member',
+                    'new_member_data': new_member_dict,               
+                }
+        )
+
+    async def return_new_member(self, event):
+        new_member_data = event['new_member_data']
+        await self.send(text_data=json.dumps({
+            'new_member': new_member_data,
+        }))
+
+    @database_sync_to_async
+    def leave_chat(self):
+        room = Room.objects.get(id = self.room_id)
+        user = self.scope["user"]
+        room.member.remove(user)
+        user_data = user.chatprofile.user_dict()
+        for member in room.all_members():
+
+            cache_key = 'chat_%s_user_%s' % (self.room_id, member.id)
+            addressee_channel_name = cache.get(cache_key)
+            async_to_sync(self.channel_layer.send)(
+                addressee_channel_name,
+                    {
+                        'type': 'return_leave_chat',
+                        'user_data': user_data,
+                    }
+            )      
+
+    async def return_leave_chat(self, event):
+        user_data = event['user_data']
+        await self.send(text_data=json.dumps({
+            'leave_chat': user_data,
         }))
