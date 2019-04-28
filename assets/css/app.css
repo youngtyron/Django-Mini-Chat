@@ -4,11 +4,11 @@
 }
 .navbar-avocado{
 	position:sticky; 
-	top:10px; 
+	top:0; 
 	left;0;
 	background-color: #226E17;
 	color: #FFFFFF;
-	z-index: 99997;
+	z-index: 99998;
 }
 .navbar-a:link {
 	color: #FFFFFF;
@@ -31,9 +31,12 @@
 	width: 50px;
 	border-radius: 50%;	
 }
-.left-div{
+.left-block{
 	position: fixed;
 	margin-left: 0;
+}
+.right-block{
+	position: fixed;
 }
 .form-div{
 /*	border: 1px solid black;
@@ -43,16 +46,35 @@
 	background-color: #FFFFFF;
 	opacity: 1;
 	width: inherit;
-}
-.messages-block{
-/*	border: 1px solid black;
-*/	
-/*	position: relative;
-/**/	bottom: 10%;
+/*	display: flex;
 */}
-.not_read{
-	background-color: #C7FCEC;
+.above-chat-block{
+	border: 1px solid black;
+	position: fixed;
+	top: 5.5%;
+	z-index: 99997;
+	background-color: #FFFFFF;
+	opacity: 1;
+	height: 7%;
+	margin: 0 auto;
+	display: flex;
+
 }
+.above-chat-link:link {
+	color: #226E17;
+}
+.above-chat-link:visited {
+	color: #226E17;
+}
+.above-chat-link:hover {
+	color: #226E17;
+}
+.above-chat-link:active {
+	color: #226E17;
+}
+.not_read{
+/*	background-color: #C7FCEC;
+*/}
 .message-img{
 	max-width: 90%;
     max-height: 90%;
@@ -142,16 +164,7 @@
 	opacity: 0.3;
 	vertical-align: center;
 }
-.above-chat-block{
-	position: fixed;
-/*s*/	top: 6.5%;
-	z-index: 99997;
-	background-color: #FFFFFF;
-	opacity: 1;
-	width: inherit;
-	height: 10%;
-	border: 1px solid red;
-}
+
 .modal-add-member-window{
 	border: 1px solid black;
 	top: 0;
@@ -183,4 +196,42 @@
 }
 .no-one-found{
 	margin: 0 auto;	
+}
+.message-cloud-li{
+	width: inherit;
+}
+.messages-block{
+	display: flex;
+	bottom: 10%;
+	top: 6%;
+	flex-direction: column;
+	width: 100%;
+	background-color: green;
+}
+.one-message-block{
+	width: 100%;
+/*	border: 1px solid blue;
+*/	display: flex;
+	background-color: #FFFFFF;
+	opacity: 1;
+	z-index: 999;
+
+}
+.my_message_block{
+	margin-bottom: 4%;
+	margin-top: 4%;
+	right: 5%;
+	text-align: right;
+	float: right;
+	margin-left: auto;
+	margin-right: 5%;
+}
+.another_message_block{
+	margin-bottom: 4%;
+	margin-top: 4%;
+	left: 5%;
+	text-align: left;
+	float: left;
+	margin-right: auto;
+	margin-left: 5%;
 }

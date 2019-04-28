@@ -1,7 +1,7 @@
 <template>
 	<div class="row">
-		<div class="col-4">
-			<div class="left-div">
+		<div class="col">
+			<div class="left-block">
 				<div v-for="user in users">
 					<p>
 						<div class="chat-member-list-avatar-div">
@@ -13,30 +13,13 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-8">
-			<div class="above-chat-block">
-				<button class="btn btn-avocado" type='button' @click='leaveChat'>Leave chat</button>
-				<button class="btn btn-avocado" type='button' @click='openAddMember'>Add chat member</button>
-			</div>
+		<div class="col-7" style='display: flex; justify-content:center;  align-items:stretch;'>
 			<div class="messages-block">
-				<ul class="list-group">
-					<p v-for="i in 10"></p>
-			        <li class="list-group-item message-cloud-li" 
-			        	v-bind:class="{not_read: message.not_read, my_message_block: message.mine, anothers_message_block: !message.mine}"
+				<div class="one-message-block" 
+						v-bind:class="{not_read: message.not_read}"
 			        	v-for="message in messages">
-			        	<div class="message-exemp-div" v-if="message.need_update" v-on:mouseover="readMessages">
-					    		<p>{{message.author.first_name}}</p>
-					    		<p>{{message.text}}</p>
-					    		<p>{{message.date}}</p>
-					    		<div class="message-flex-img-container">
-			 	   		    		<div class="message-flex-img-row">
-					   		    		<div class="message-flex-img-col" v-for="image in message.images">
-					    					<img :src="image" class="message-img" alt="Image">
-					    				</div> 			
-				    				</div> 		 		
-					    		</div>
-				        </div>
-				        <div class="message-exemp-div" v-else>
+					<div class="message-exemp-div" 
+						v-bind:class="{my_message_block: message.mine, another_message_block: !message.mine}" v-if="message.need_update" v-on:mouseover="readMessages">
 				    		<p>{{message.author.first_name}}</p>
 				    		<p>{{message.text}}</p>
 				    		<p>{{message.date}}</p>
@@ -47,9 +30,20 @@
 				    				</div> 			
 			    				</div> 		 		
 				    		</div>
-			        	</div>
-				   	</li>
-		        </ul>
+			        </div>
+			        <div class="message-exemp-div" v-bind:class="{my_message_block: message.mine, another_message_block: !message.mine}" v-else>
+			    		<p>{{message.author.first_name}}</p>
+			    		<p>{{message.text}}</p>
+			    		<p>{{message.date}}</p>
+			    		<div class="message-flex-img-container">
+	 	   		    		<div class="message-flex-img-row">
+			   		    		<div class="message-flex-img-col" v-for="image in message.images">
+			    					<img :src="image" class="message-img" alt="Image">
+			    				</div> 			
+		    				</div> 		 		
+			    		</div>
+		        	</div>
+				</div>
 			</div>
 	        <div class="form-div">
 		        <form action="">
@@ -104,6 +98,16 @@
 			</div>
 
 		</div>
+		<div class="col">
+			<div class="right-block">
+				<nav class="nav flex-column">
+				  <a class="nav-link  above-chat-link" @click='leaveChat' href="#"><i class="fas fa-door-open fa-2x"></i>Leave chat</a>
+				  <a class="nav-link  above-chat-link"  @click='openAddMember' href="#"><i class="fas fa-user-plus fa-2x"></i>Add user</a>
+				</nav>
+			</div>
+
+
+		</div>
     </div>
 </template>
 
@@ -143,6 +147,7 @@
 		    	var data = JSON.parse(e.data);
 		    	if (data['messages_portion']){
 	        		var messages = data['messages_portion']
+	        		console.log(data['messages_portion'])
 	        		var new_counter = data['counter']
 	        		this.raw_messages = messages
 	        		this.messages = this.raw_messages.reverse().concat(this.messages)

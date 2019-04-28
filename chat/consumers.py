@@ -93,7 +93,7 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
     def get_messages_portion(self, counter):
         room = Room.objects.get(id = self.room_id)
         user = self.scope["user"]
-        border = counter + 5
+        border = counter + 10
         messages = room.all_messages()[counter : border]
         messages_pack = list()
         for message in messages:
