@@ -47,10 +47,9 @@
 			</div>
 	        <div class="form-div">
 		        <form action="">
-		    		<div class="form-group">
-		    			<input type="text" id="message-input" v-model="text_input" class="form-control" 
-		    												  v-on:keypress='translateTyping(); keyPressTracking(7000)'
-		    												  style="">
+		    		<div class="form-group col-md-6 message-input-div">
+		    			<input type="text" id="message-input" v-model="text_input" class="form-control text-center" 
+		    												  v-on:keypress='translateTyping(); keyPressTracking(7000)'>
 		    		</div>
 
 		    		<div class="form-group col-md-6">
