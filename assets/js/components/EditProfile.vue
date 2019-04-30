@@ -12,6 +12,7 @@
 				<input type="file" id="avatar-input" name="avatar-input" v-on:change="postInputFunc" class="form-control">
 			</form>
 		</div>
+		<p @click='deleteAccount'>You can delete your account</p>
     </div>
 </template>
 
@@ -50,6 +51,15 @@
  				},
  				avatarInput: function(){
  					document.getElementById('avatar-input').click();
+ 				},
+ 				deleteAccount: function(){
+ 					if (confirm("Are you sure? You wouldn't be able to cancel it.")){
+ 						axios.post('/delete_account/').then((response) => {
+	 							if (response.data['success'] == true){
+	 								window.location.href = window.location.origin;
+	 							}
+	                    	});
+ 					}
  				}
             }      
         };

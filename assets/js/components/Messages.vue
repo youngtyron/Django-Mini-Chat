@@ -2,7 +2,7 @@
 	<div class="row">
 		<div class="col">
 			<div class="left-block">
-				<div v-for="user in users">
+				<div v-for="user in visible_users">
 					<p>
 						<div class="chat-member-list-avatar-div">
 							<img :src="user.avatar" alt="Avatar" class="chat-member-list-avatar-img">
@@ -11,6 +11,8 @@
 					</p>
 					<p v-if="user.online == true">Online</p>
 				</div>
+				<p v-if="visible_users_start + 5 <= users.length" @click='showMoreUsers'>Show more</p>
+				<p v-else @click='backToFirst'>Back to first</p>
 			</div>
 		</div>
 		<div class="col-7" style='display: flex; justify-content:center;  align-items:stretch;'>
@@ -52,7 +54,7 @@
 		    												  v-on:keypress='translateTyping(); keyPressTracking(7000)'>
 		    		</div>
 
-		    		<div class="form-group col-md-6">
+		    		<div class="form-group col-md-6 send-and-add-picture">
 		    			<i class="fas fa-camera-retro fa-2x avocado-icon" @click="activateImagesInput"></i>
 		    			<button type="submit" class="btn btn-avocado" @click="sendMessage">Send</button>
 		    		</div>
@@ -115,6 +117,8 @@
     	props: ['room_id'],
         data(){
             return  {
+            	visible_users: [],
+            	visible_users_start: null,
             	users: [],
             	messages: [],
             	raw_messages: [],
@@ -239,7 +243,18 @@
         		getUsers: function(){
 				   	axios.get('/chat/get_users/' + this.room_id + '/').then((response) => {
  						this.users = response.data['users'];
+ 						this.visible_users = this.users.slice(0, 5);
+ 						this.visible_users_start = 0;
                     });
+        		},
+        		showMoreUsers: function(){
+        			this.visible_users_start = this.visible_users_start + 5;
+        			var end = this.visible_users_start + 5;
+        			this.visible_users = this.users.slice(this.visible_users_start, end);
+        		},
+        		backToFirst: function(){
+					this.visible_users = this.users.slice(0, 5);
+					this.visible_users_start = 0;       			
         		},
         		scrollMessages: function(){
         			console.log('scroll')

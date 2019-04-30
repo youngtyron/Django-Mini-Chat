@@ -25,6 +25,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
+from django.views.generic.base import View
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
@@ -36,7 +37,15 @@ from chat.models import ChatProfile
 
 UserModel = get_user_model()
 
-class EditProfile(TemplateView, LoginRequiredMixin):
+
+class DeleteAccountView(View, LoginRequiredMixin):
+    def post(self, request):
+        if request.is_ajax:
+            user = self.request.user
+            user.delete()
+            return JsonResponse({'success':True}, status= 200)
+
+class EditProfileView(TemplateView, LoginRequiredMixin):
     template_name = 'edit_profile.html'
 
     def get_context_data(self, **kwargs):
