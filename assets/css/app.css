@@ -197,16 +197,14 @@
 	top: 6%;
 	flex-direction: column;
 	width: 100%;
-	background-color: green;
 }
 .one-message-block{
 	width: 100%;
-/*	border: 1px solid blue;
-*/	display: flex;
+	/*border: 1px solid green;*/
+	display: flex;
 	background-color: #FFFFFF;
 	opacity: 1;
 	z-index: 999;
-
 }
 .my_message_block{
 	margin-bottom: 4%;
@@ -242,4 +240,38 @@
 	background-color: #FFFFFF;
 	opacity: 1;
 	width: 50%;
+}
+
+
+.gallery-modal{
+	height: 70%;
+	max-width: 80%;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	background-color: rgba(255,255,255, 0);
+	position: fixed;
+	vertical-align: middle;
+	text-align: center;
+	z-index: 99998;
+	margin: 10% auto;
+	justify-content: center;
+	display: flex;
+}
+.i-left-arrow{
+	display: flex;
+	align-items: center;
+}
+.i-right-arrow{
+	display: flex;
+	align-items: center;
+}
+.img-in-gallery{
+	align-items: center;
+	height: 90%;
+}
+.opened-img{
+	max-width: 100%;
+	max-height: 100%;
 }

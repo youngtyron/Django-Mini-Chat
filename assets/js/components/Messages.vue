@@ -28,7 +28,7 @@
 				    		<div class="message-flex-img-container">
 		 	   		    		<div class="message-flex-img-row">
 				   		    		<div class="message-flex-img-col" v-for="image in message.images">
-				    					<img :src="image" class="message-img" alt="Image">
+				    					<img :src="image" class="message-img" alt="Image" @click='openInGallery(image, message.images)'>
 				    				</div> 			
 			    				</div> 		 		
 				    		</div>
@@ -40,7 +40,7 @@
 			    		<div class="message-flex-img-container">
 	 	   		    		<div class="message-flex-img-row">
 			   		    		<div class="message-flex-img-col" v-for="image in message.images">
-			    					<img :src="image" class="message-img" alt="Image">
+			    					<img :src="image" class="message-img" alt="Image"  @click='openInGallery(image, message.images)'>
 			    				</div> 			
 		    				</div> 		 		
 			    		</div>
@@ -98,6 +98,18 @@
                 </div>
 			</div>
 
+			<div v-if="galleryModal" class="gallery-modal text-center">
+				<div class="i-left-arrow">
+					<i class="fas fa-arrow-circle-left fa-3x" style='color: #226E17;' @click="previousImage"></i>					
+				</div>
+				<div class="img-in-gallery">
+					<img :src="opened_img" alt="Image" class="opened-img">					
+				</div>
+				<div class="i-right-arrow">
+					<i class="fas fa-arrow-circle-right fa-3x" style='color: #226E17;' @click="nextImage"></i>					
+				</div>
+			</div>
+
 		</div>
 		<div class="col">
 			<div class="right-block">
@@ -133,6 +145,9 @@
             	addMemberModal: false,
             	potential_members: [],
             	search_member: '',
+            	galleryModal: false,
+            	opened_img: '',
+            	gallery_images: [],
             }
         },
         mounted() {
@@ -415,6 +430,33 @@
 			        }));	
 			        this.addMemberModal = false
 		 		},
+		 		openInGallery: function(this_image, images){
+		 			this.opened_img = this_image;
+		 			this.gallery_images = images
+		 			this.galleryModal = true;
+		 		},
+		 		nextImage: function(){
+		 			var index = this.gallery_images.indexOf(this.opened_img);
+		 			if (index + 1 == this.gallery_images.length){
+		 				var new_index = 0;
+		 			}
+		 			else{
+		 				var new_index = index + 1;
+		 			}
+		 			this.opened_img = this.gallery_images[new_index];
+		 		},
+		 		previousImage: function(){
+		 			var index = this.gallery_images.indexOf(this.opened_img);
+		 			if (index == 0){
+		 				var new_index = this.gallery_images.length - 1;
+		 			}
+		 			else{
+		 				var new_index = index - 1;
+		 			}
+		 			console.log('length ' + this.gallery_images.length)
+		 			console.log('new_index ' + new_index)
+		 			this.opened_img = this.gallery_images[new_index];
+		 		},	 		
             }      
         };
 </script>
