@@ -40,6 +40,7 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
         if data['command'] == 'create_message':
             text_message = data['message']
             images_id_list = data['images']            
+            await self.stoptyping_translate()
             await self.create_message(text_message, images_id_list)
         elif data['command'] == 'get_messages':
             counter = data['counter']

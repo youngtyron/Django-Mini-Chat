@@ -194,13 +194,13 @@
 .messages-block{
 	display: flex;
 	bottom: 10%;
+	margin-bottom: 200px;
 	top: 6%;
 	flex-direction: column;
 	width: 100%;
 }
 .one-message-block{
 	width: 100%;
-	/*border: 1px solid green;*/
 	display: flex;
 	background-color: #FFFFFF;
 	opacity: 1;

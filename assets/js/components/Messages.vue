@@ -251,7 +251,7 @@
 					alert(data['leave_chat'].first_name + ' ' + data['leave_chat'].last_name + ' left this chat');
 		    	}
 		  	});
-			window.addEventListener('keypress', this.keyListener);
+			window.addEventListener('keydown', this.keyListener);
 			window.addEventListener('scroll', this.scrollMessages);
 			window.addEventListener('click', (e)=> {
 				if (this.galleryModal==true){
@@ -347,6 +347,11 @@
 					 	if (document.activeElement == document.getElementById('message-input')){
 			              this.sendMessage(e)
 			            }
+		 			}
+		 			else if (key==27 && this.galleryModal==true){
+		 				this.galleryModal = false;
+						this.opened_img = null;
+						this.gallery_images = [];			
 		 			}
 		 		},
 		 		readMessages: function(){
