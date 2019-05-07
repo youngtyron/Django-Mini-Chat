@@ -100,10 +100,12 @@
 
 			<div v-if="galleryModal" class="gallery-modal text-center">
 				<div class="i-left-arrow">
-					<i class="fas fa-arrow-circle-left fa-3x" style='color: #226E17;' @click="previousImage"></i>					
+					<i class="fas fa-arrow-circle-left fa-3x" style='color: #226E17;' @click="previousImage"></i>				
 				</div>
 				<div class="img-in-gallery">
-					<img :src="opened_img" alt="Image" class="opened-img">					
+					<div class="img-in-gallery-sub">
+						<img :src="opened_img" alt="Image" class="opened-img">					
+					</div>
 				</div>
 				<div class="i-right-arrow">
 					<i class="fas fa-arrow-circle-right fa-3x" style='color: #226E17;' @click="nextImage"></i>					
@@ -146,7 +148,7 @@
             	potential_members: [],
             	search_member: '',
             	galleryModal: false,
-            	opened_img: '',
+            	opened_img: null,
             	gallery_images: [],
             }
         },
@@ -165,7 +167,6 @@
 		    	var data = JSON.parse(e.data);
 		    	if (data['messages_portion']){
 	        		var messages = data['messages_portion']
-	        		console.log(data['messages_portion'])
 	        		var new_counter = data['counter']
 	        		this.raw_messages = messages
 	        		this.messages = this.raw_messages.reverse().concat(this.messages)
@@ -252,8 +253,18 @@
 		  	});
 			window.addEventListener('keypress', this.keyListener);
 			window.addEventListener('scroll', this.scrollMessages);
-
-        },
+			window.addEventListener('click', (e)=> {
+				if (this.galleryModal==true){
+					var img = document.getElementsByClassName('opened-img')[0]
+					if(e.target!=img && e.target.className!='fas fa-arrow-circle-left fa-3x' 
+						&& e.target.className!='fas fa-arrow-circle-right fa-3x' && e.target.className!='message-img'){
+						this.galleryModal = false;
+						this.opened_img = null;
+						this.gallery_images = [];	
+					}
+				}
+			});			
+		},
         methods: {
         		getUsers: function(){
 				   	axios.get('/chat/get_users/' + this.room_id + '/').then((response) => {
@@ -272,7 +283,6 @@
 					this.visible_users_start = 0;       			
         		},
         		scrollMessages: function(){
-        			console.log('scroll')
         			var sctop =  document.documentElement.scrollTop;
         			if (sctop == 0){
 	        			this.commonRoomSocket.send(JSON.stringify({
@@ -402,14 +412,12 @@
 			        }));
 		 		},
 		 		leaveChat: function(){
-		 			console.log('leaveChat')
    					this.commonRoomSocket.send(JSON.stringify({
 			            'command': 'leave_chat'
 			        }));	
                     window.location.href= window.location.origin;
 		 		},
 		 		openAddMember: function(){
-		 			console.log('addMember')
 		 			this.addMemberModal = true;
 		 		},
 		 		findMemberOnTyping: function(){
@@ -418,7 +426,6 @@
                     axios.post('/chat/potential_members/' + this.room_id + '/', data)
                         .then((response) => {
 	 						this.potential_members = response.data['potential_members'];
-	 						console.log(this.potential_members)
                         }).catch((error)=>{
                             console.log(error)
                         });
@@ -453,10 +460,8 @@
 		 			else{
 		 				var new_index = index - 1;
 		 			}
-		 			console.log('length ' + this.gallery_images.length)
-		 			console.log('new_index ' + new_index)
 		 			this.opened_img = this.gallery_images[new_index];
-		 		},	 		
+		 		},	 			 		
             }      
         };
 </script>

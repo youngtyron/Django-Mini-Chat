@@ -244,8 +244,8 @@
 
 
 .gallery-modal{
-	height: 70%;
-	max-width: 80%;
+	height: 100%;
+	width: 100%;
 	top: 0;
 	left: 0;
 	bottom: 0;
@@ -255,7 +255,7 @@
 	vertical-align: middle;
 	text-align: center;
 	z-index: 99998;
-	margin: 10% auto;
+	margin: 0 auto;
 	justify-content: center;
 	display: flex;
 }
@@ -268,8 +268,12 @@
 	align-items: center;
 }
 .img-in-gallery{
+	display: flex;
 	align-items: center;
-	height: 90%;
+}
+.img-in-gallery-sub{
+	display: flex;
+	align-items: center;
 }
 .opened-img{
 	max-width: 100%;
