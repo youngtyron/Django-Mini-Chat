@@ -100,7 +100,7 @@
 
 			<div v-if="galleryModal" class="gallery-modal text-center">
 				<div class="i-left-arrow">
-					<i class="fas fa-arrow-circle-left fa-3x" style='color: #226E17;' @click="previousImage"></i>				
+					<i class="fas fa-arrow-circle-left fa-3x" @click="previousImage"></i>				
 				</div>
 				<div class="img-in-gallery">
 					<div class="img-in-gallery-sub">
@@ -108,7 +108,7 @@
 					</div>
 				</div>
 				<div class="i-right-arrow">
-					<i class="fas fa-arrow-circle-right fa-3x" style='color: #226E17;' @click="nextImage"></i>					
+					<i class="fas fa-arrow-circle-right fa-3x" @click="nextImage"></i>					
 				</div>
 			</div>
 

@@ -1,13 +1,17 @@
 .btn-avocado{
-	background-color: #226E17;
-	color: #FFFFFF;
+/*	background-color: #226E17;
+*/	color: #FFFFFF;
+	background-color: #000000;
+
 }
 .navbar-avocado{
 	position:sticky; 
 	top:0; 
 	left;0;
-	background-color: #226E17;
-	color: #FFFFFF;
+/*	background-color: #226E17;
+*/	color: #FFFFFF;
+	background-color: #000000;
+
 	z-index: 99998;
 }
 .navbar-a:link {
@@ -52,16 +56,22 @@
 
 }
 .above-chat-link:link {
-	color: #226E17;
+/*	color: #226E17;
+*/	color: #000000;
 }
 .above-chat-link:visited {
-	color: #226E17;
+/*	color: #226E17;
+*/	color: #000000;
+
 }
 .above-chat-link:hover {
-	color: #226E17;
+/*	color: #226E17;
+*/
+    color: #000000;
 }
 .above-chat-link:active {
-	color: #226E17;
+	/*color: #226E17;*/
+	color: #000000;
 }
 .not_read{
 /*	background-color: #C7FCEC;
