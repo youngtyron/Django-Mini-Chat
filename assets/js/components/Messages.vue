@@ -55,8 +55,8 @@
 		    		</div>
 
 		    		<div class="form-group col-md-6 send-and-add-picture">
-		    			<i class="fas fa-camera-retro fa-2x avocado-icon" @click="activateImagesInput"></i>
-		    			<button type="submit" class="btn btn-avocado" @click="sendMessage">Send</button>
+		    			<i class="fas fa-camera-retro fa-2x" @click="activateImagesInput"></i>
+		    			<button type="submit" id="send-message" class="btn btn-avocado" @click="sendMessage">Send</button>
 		    		</div>
 				</form>
 				<form enctype="multipart/form-data" id="images-form">

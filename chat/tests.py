@@ -5,35 +5,65 @@ from django.test import Client
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.webdriver.firefox.webdriver import WebDriver
-
-# class FirstTest(TestCase):
-# 	def setUp(self):
-# 		self.c = Client()
-
-# 	def test_welcome_page(self):
-# 		response = self.c.get('/')
-# 		self.assertEqual(response.status_code, 200)
-
-# 	def test_all_profiles(self):
-# 		names = ['John', 'Will', 'Mary', 'Nickole', 'Larry', 'Alice', 'Sam', 'Ricky', 'Laura', 'Rita']
-# 		lasts = ['Hayword', 'Larsson', 'Le Blanc', 'Conroy', 'Malony', 'Vega', 'Warner', 'Collins', 'Torrance']
-# 		for i in range(5):
-# 			name = random.choice(names)
-# 			last = random.choice(lasts)
-# 			username = name + '_' + last
-# 			user = User.objects.create(username = username, first_name = name, last_name= last)
-# 			user.set_password('12345678')
-# 			user.save()
-# 		all_users = User.objects.all()
-# 		print(all_users)
-# 		for user in all_users:
-# 			url = '/profile/' + user.username
-# 			response = self.c.get(url)
-# 			self.assertEqual(response.status_code, 200)
+from faker import Faker
+from chat.models import Room, Message
 
 
-class MySeleniumTests(StaticLiveServerTestCase):
-    # fixtures = ['user-data.json']
+import pytest
+from channels.testing import WebsocketCommunicator
+from chat.consumers import CommonRoomConsumer
+
+
+class ComplicatedSeleniumTests(StaticLiveServerTestCase):
+
+	@classmethod
+	def setUpClass(cls):
+		super().setUpClass()
+		cls.browsers_number = random.randint(2, 20)
+		cls.selenium_list = list()
+		for i in range(cls.browsers_number):
+			cls.selenium_list.append( WebDriver())
+			cls.selenium_list[i].implicitly_wait(10)
+
+	@classmethod
+	def tearDownClass(cls):
+		for i in range(cls.browsers_number):
+			cls.selenium_list[i].quit()
+		super().tearDownClass()
+
+	def create_users(self, counter):
+		factory = Faker()
+		users_list = list()
+		for i in range(counter):
+			username = 'username' + str(i)
+			password = factory.password()
+			first_name = factory.first_name()
+			last_name = factory.first_name()
+			user = User.objects.create(username = username, first_name = first_name, last_name= last_name)
+			user.set_password(password)
+			user.save()
+			users_list.append({'username': username, 'password': password})
+		return users_list
+
+	def test_simple_chatting(self):
+		chatters = self.create_users(self.browsers_number)
+		room = Room.objects.create()
+		factory = Faker()
+		for chatter in chatters:
+			user = User.objects.get(username = chatter['username'])
+			room.member.add(user)
+		for i in range(self.browsers_number):
+			self.selenium_list[i].get('%s%s' % (self.live_server_url, '/'))
+			username_input = self.selenium_list[i].find_element_by_name("username")
+			username_input.send_keys(chatters[i]['username'])
+			password_input = self.selenium_list[i].find_element_by_name("password")
+			password_input.send_keys(chatters[i]['password'])
+			self.selenium_list[i].find_element_by_id('login_button').click()
+			room_url = '/chat/room/' + str(room.id)
+			self.selenium_list[i].get('%s%s' % (self.live_server_url, room_url))
+
+
+class SimpleSeleniumTests(StaticLiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -46,17 +76,45 @@ class MySeleniumTests(StaticLiveServerTestCase):
         cls.selenium.quit()
         super().tearDownClass()
 
-    def create_user_exemplar(self):
-    	user = User.objects.create(username = 'NewUser', first_name = 'Test', last_name= 'User')
-    	user.set_password('12345678')
-    	user.save()    	
+    def create_user_exemplar(self, counter):
+    	factory = Faker()
+    	users_list = list()
+    	for i in range(counter):
+    		username = 'username' + str(i)
+    		password = factory.password()
+    		first_name = factory.first_name()
+    		last_name = factory.first_name()
+    		user = User.objects.create(username = username, first_name = first_name, last_name= last_name)
+    		user.set_password(password)
+    		user.save()
+    		users_list.append({'username': username, 'password': password})
+    	return users_list
+
 
     def test_login(self):
-    	self.create_user_exemplar()
-    	self.selenium.get('%s%s' % (self.live_server_url, '/'))
+	    user = self.create_user_exemplar(1)[0]
+	    self.selenium.get('%s%s' % (self.live_server_url, '/'))
+	    username_input = self.selenium.find_element_by_name("username")
+	    username_input.send_keys(user['user']['username'])
+	    password_input = self.selenium.find_element_by_name("password")
+	    password_input.send_keys(user['password'])
+	    self.selenium.find_element_by_id('login_button').click()
+	    logout = self.selenium.find_element_by_id('logout')
+
+
+    def test_registration(self):
+    	self.selenium.get('%s%s' % (self.live_server_url, '/registration'))
     	username_input = self.selenium.find_element_by_name("username")
-    	username_input.send_keys('NewUser')
-    	password_input = self.selenium.find_element_by_name("password")
-    	password_input.send_keys('12345678')
-    	self.selenium.find_element_by_id('login_button').click()
-    	logout = self.selenium.find_element_by_id('logout')
+    	username_input.send_keys('NewRegistratedUser')
+    	first_name_input = self.selenium.find_element_by_name("first_name")
+    	first_name_input.send_keys("FirstName")
+    	last_name_input = self.selenium.find_element_by_name("last_name")
+    	last_name_input.send_keys("LastName")
+    	email_input = self.selenium.find_element_by_name("email")
+    	email_input.send_keys("test@mail.com")
+    	password_input = self.selenium.find_element_by_name("password1")
+    	password_input.send_keys("12345678")
+    	confirm_input = self.selenium.find_element_by_name("password2")
+    	confirm_input.send_keys("12345678")
+    	self.selenium.find_element_by_xpath('//input[@value="Register"]').click()
+    	self.selenium.find_element_by_id('logout'):

@@ -30,7 +30,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.shortcuts import render
 from .forms import RegistrationForm
 from chat.views import become_online_chat_announcement, become_offline_chat_announcement
 from chat.models import ChatProfile
@@ -89,15 +89,18 @@ class RegistrationView(FormView):
         last_name = form.cleaned_data['last_name']
         email = form.cleaned_data['email']
         password = form.cleaned_data['password1']
-        user = User.objects.create_user(username = username,
-                                        email = email,
-                                        password = password,
-                                        first_name = first_name,
-                                        last_name = last_name)
-        ChatProfile.objects.create(user = user)
-        auth_login(self.request, user)
-        cache.add('user_online_' + str(self.request.user.id), True, 999999)
-        return super(RegistrationView, self).form_valid(form)
+        confirm = form.cleaned_data['password2']
+        if password == confirm:
+            user = User.objects.create_user(username = username,
+                                            email = email,
+                                            password = password,
+                                            first_name = first_name,
+                                            last_name = last_name)
+            ChatProfile.objects.create(user = user)
+            auth_login(self.request, user)
+            cache.add('user_online_' + str(self.request.user.id), True, 999999)
+            return super(RegistrationView, self).form_valid(form)
+        return render(self.request, 'registration.html', {'form': form})
 
 class SuccessURLAllowedHostsMixin:
     success_url_allowed_hosts = set()

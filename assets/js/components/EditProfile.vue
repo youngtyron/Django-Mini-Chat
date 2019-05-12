@@ -1,18 +1,24 @@
 <template>
 	<div class="row">
 		<div class="col text-center">
-			<div class="edit-profile-avatar-div">
-				<img :src="avatar[0]" alt="Avatar" id="edit-profile-avatar-img">
-			</div>
 			<p>{{firstname}}</p>
 			<p>{{lastname}}</p>
-			<button class="btn btn-avocado" @click='avatarInput'>Choice picture</button>
-			<button class="btn btn-avocado" @click='sendNewAvatar'>Send picture</button>
+			<ul class="list-group">
+				<li class="list-group-item" @click='avatarInput'>
+					<div class="edit-profile-avatar-div">
+						<img :src="avatar[0]" alt="Avatar" id="edit-profile-avatar-img">
+					</div>
+				</li>
+				<li class="list-group-item" v-if='clungPhoto' @click='sendNewAvatar'>Update</li>
+				<li class="list-group-item" v-else @click='avatarInput'>New Profile Photo</li>
+				<li class="list-group-item" @click='deleteAccount'>You can delete your account</li>
+			</ul>
+			<!-- <button class="btn btn-avocado" @click='avatarInput'>Choice picture</button>
+			<button class="btn btn-avocado" @click='sendNewAvatar'>Send picture</button> -->
 			<form enctype="multipart/form-data" id="avatar-form">
 				<input type="file" id="avatar-input" name="avatar-input" v-on:change="postInputFunc" class="form-control">
 			</form>
 		</div>
-		<p @click='deleteAccount'>You can delete your account</p>
     </div>
 </template>
 
@@ -22,6 +28,7 @@
         data(){
             return  {
             	AvatarFormData: null,
+            	clungPhoto: false,
             }
         },
         mounted() {
@@ -36,6 +43,7 @@
 					          'Content-Type': 'multipart/form-data'
 					        }}).then((response) => {
 	 							document.getElementById('edit-profile-avatar-img').src = response.data['avatar_url'];
+	 							this.clungPhoto = false;		
 	                    	});
         			}
         		},
@@ -47,7 +55,8 @@
 	 			    	var place = document.getElementById('edit-profile-avatar-img');
 	 			    	place.src = e.target.result;
 				    }
-					reader.readAsDataURL(new_avatar); 					
+					reader.readAsDataURL(new_avatar); 	
+					this.clungPhoto = true;				
  				},
  				avatarInput: function(){
  					document.getElementById('avatar-input').click();
