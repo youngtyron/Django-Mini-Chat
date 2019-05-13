@@ -13,8 +13,6 @@
 				<li class="list-group-item" v-else @click='avatarInput'>New Profile Photo</li>
 				<li class="list-group-item" @click='deleteAccount'>You can delete your account</li>
 			</ul>
-			<!-- <button class="btn btn-avocado" @click='avatarInput'>Choice picture</button>
-			<button class="btn btn-avocado" @click='sendNewAvatar'>Send picture</button> -->
 			<form enctype="multipart/form-data" id="avatar-form">
 				<input type="file" id="avatar-input" name="avatar-input" v-on:change="postInputFunc" class="form-control">
 			</form>

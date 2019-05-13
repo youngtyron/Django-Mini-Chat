@@ -37,7 +37,6 @@
         		getRooms: function(){
         			axios.get('/chat/get_rooms/').then((response) => {
  						this.rooms = response.data['rooms'];
- 						console.log(this.rooms)
                     });
         		}
             }      

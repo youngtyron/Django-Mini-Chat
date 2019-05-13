@@ -14,7 +14,7 @@
                     </p>
                 </li>
             </ul>
-            <button v-if="added_users.length > 0" class="btn btn-avocado" @click='createChat' type="button">Create chat</button>
+            <button v-if="added_users.length > 0" class="btn btn-black" @click='createChat' type="button">Create chat</button>
         </div>
 		<div class='col-8'>
 			<div class="user-search-div">
@@ -60,8 +60,6 @@
                     axios.post('/chat/search_users/', data)
                         .then((response) => {
                             this.matched_users = response.data['matched_users']
-                        }).catch((error)=>{
-                            console.log(error)
                         });
                 },
                 addUser: function(choosen){
@@ -93,8 +91,6 @@
                         .then((response) => {
                             var url = window.location.origin + '/chat/room/' + response.data['room_id'];
                             window.location.href= url;
-                        }).catch((error)=>{
-                            console.log(error)
                         });
                 }
             }      

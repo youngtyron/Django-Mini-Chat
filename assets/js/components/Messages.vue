@@ -11,8 +11,8 @@
 					</p>
 					<p v-if="user.online == true">Online</p>
 				</div>
-				<p v-if="visible_users_start + 5 <= users.length" @click='showMoreUsers'>Show more</p>
-				<p v-else @click='backToFirst'>Back to first</p>
+				<a href="" v-if="visible_users_start + 5 <= users.length" @click='showMoreUsers'>Show more</a>
+				<a href="" v-else @click='backToFirst'>Back to first</a>
 			</div>
 		</div>
 		<div class="col-7" style='display: flex; justify-content:center;  align-items:stretch;'>
@@ -56,7 +56,7 @@
 
 		    		<div class="form-group col-md-6 send-and-add-picture">
 		    			<i class="fas fa-camera-retro fa-2x" @click="activateImagesInput"></i>
-		    			<button type="submit" id="send-message" class="btn btn-avocado" @click="sendMessage">Send</button>
+		    			<button type="submit" id="send-message" class="btn btn-black" @click="sendMessage">Send</button>
 		    		</div>
 				</form>
 				<form enctype="multipart/form-data" id="images-form">
@@ -73,7 +73,7 @@
 					  </div>
 				  </div>
 				</div>
-				<button id="attach-images-button" class="btn btn-avocado" type="button" @click="attachImages">Attach</button>
+				<button id="attach-images-button" class="btn btn-black" type="button" @click="attachImages">Attach</button>
 			</div>
 
 			<div v-if="addMemberModal" class="modal-add-member-window text-center">
@@ -273,12 +273,14 @@
  						this.visible_users_start = 0;
                     });
         		},
-        		showMoreUsers: function(){
+        		showMoreUsers: function(e){
+        			e.preventDefault();
         			this.visible_users_start = this.visible_users_start + 5;
         			var end = this.visible_users_start + 5;
         			this.visible_users = this.users.slice(this.visible_users_start, end);
         		},
-        		backToFirst: function(){
+        		backToFirst: function(e){
+        			e.preventDefault();
 					this.visible_users = this.users.slice(0, 5);
 					this.visible_users_start = 0;       			
         		},
@@ -312,8 +314,6 @@
 						            'images' : id_list,
 						            'command': 'create_message'
 						        }));
-					    }).catch(function(error){
-					    	console.error(error)
 					    });
 
 		 			}
@@ -329,8 +329,6 @@
 						            'images' : id_list,
 						            'command': 'create_message'
 						        }));
-					    }).catch(function(error){
-					    	console.error(error)
 					    });		 				
 		 			}
 		 			else if (text_message != ''){
@@ -431,8 +429,6 @@
                     axios.post('/chat/potential_members/' + this.room_id + '/', data)
                         .then((response) => {
 	 						this.potential_members = response.data['potential_members'];
-                        }).catch((error)=>{
-                            console.log(error)
                         });
 		 		},
 		 		addMember: function(potential_id){

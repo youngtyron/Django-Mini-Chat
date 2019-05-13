@@ -1,17 +1,20 @@
-.btn-avocado{
-/*	background-color: #226E17;
-*/	color: #FFFFFF;
+.center-box{
+	margin: 0 auto;
+	margin-top:10%;
+}
+.btn-black{
+	color: #FFFFFF;
 	background-color: #000000;
 
 }
-.navbar-avocado{
+.navbar-black{
 	position:sticky; 
 	top:0; 
 	left;0;
-/*	background-color: #226E17;
-*/	color: #FFFFFF;
+	color: #FFFFFF!important;
 	background-color: #000000;
-
+	/*min-height: 50px;*/
+	/*max-height: 70px;*/
 	z-index: 99998;
 }
 .navbar-a:link {
@@ -56,21 +59,16 @@
 
 }
 .above-chat-link:link {
-/*	color: #226E17;
-*/	color: #000000;
+	color: #000000;
 }
 .above-chat-link:visited {
-/*	color: #226E17;
-*/	color: #000000;
+	color: #000000;
 
 }
 .above-chat-link:hover {
-/*	color: #226E17;
-*/
     color: #000000;
 }
 .above-chat-link:active {
-	/*color: #226E17;*/
 	color: #000000;
 }
 .not_read{
@@ -251,8 +249,6 @@
 	opacity: 1;
 	width: 50%;
 }
-
-
 .gallery-modal{
 	height: 100%;
 	width: 100%;
