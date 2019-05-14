@@ -2,5 +2,10 @@
 
 {% block content %}
 	{% csrf_token %}
-	<edit-profile firstname="{{user.first_name}}" lastname="{{user.last_name}}" :avatar="{{avatar}}"></edit-profile>
+	<edit-profile 
+		  firstname="{{user.first_name}}" 
+		  lastname="{{user.last_name}}" 
+		  city="{{city}}" 
+		  birthday="{{birthday}}" 
+		  :avatar="{{avatar}}"></edit-profile>
 {% endblock %}

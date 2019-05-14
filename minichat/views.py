@@ -51,6 +51,8 @@ class EditProfileView(TemplateView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['avatar'] = [self.request.user.chatprofile.avatar_url()]
+        context['city'] = self.request.user.chatprofile.city
+        context['birthday'] = self.request.user.chatprofile.birthday
         context['user'] = self.request.user
         return context
 

@@ -1,17 +1,28 @@
 <template>
 	<div class="row">
 		<div class="col text-center">
-			<p>{{firstname}}</p>
-			<p>{{lastname}}</p>
+			<p class="subtitle">{{firstname}} {{lastname}}</p>
 			<ul class="list-group">
 				<li class="list-group-item" @click='avatarInput'>
 					<div class="edit-profile-avatar-div">
 						<img :src="avatar[0]" alt="Avatar" id="edit-profile-avatar-img">
 					</div>
 				</li>
-				<li class="list-group-item" v-if='clungPhoto' @click='sendNewAvatar'>Update</li>
-				<li class="list-group-item" v-else @click='avatarInput'>New Profile Photo</li>
-				<li class="list-group-item" @click='deleteAccount'>You can delete your account</li>
+				<li class="list-group-item" v-if='clungPhoto' @click='sendNewAvatar'>
+					<p style='font-weight: bold; color: #000066;'>Update</p>
+				</li>
+				<li class="list-group-item" v-else @click='avatarInput'>
+					<p style='font-weight: bold; color: #000066;'>New Profile Photo</p>
+				</li>
+				<li class="list-group-item" @click=''>
+					<p style='font-weight: bold; color: #000066;'>{{city}}</p>
+				</li>
+				<li class="list-group-item" @click=''>
+					<p style='font-weight: bold; color: #000066;'>{{birthday}}</p>
+				</li>
+				<li class="list-group-item" @click='deleteAccount'>
+					<p style='font-weight: bold; color: #000066;'>You can delete your account</p>
+				</li>
 			</ul>
 			<form enctype="multipart/form-data" id="avatar-form">
 				<input type="file" id="avatar-input" name="avatar-input" v-on:change="postInputFunc" class="form-control">
@@ -22,7 +33,7 @@
 
 <script>
     export default {
-    	props: ['firstname', 'lastname', 'avatar'],
+    	props: ['firstname', 'lastname', 'avatar', 'city', 'birthday'],
         data(){
             return  {
             	AvatarFormData: null,

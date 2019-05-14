@@ -1,10 +1,36 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-{{user.first_name}} {{user.last_name}}
-
-
-<a href="{% url 'edit_profile' %}">Edit profile</a>
-
+		<div class="row">
+		<div class="col text-center">
+			<div class="center-box">
+				<ul class="list-group">
+					<li class="list-group-item">
+						<p class="subtitle">{{user.first_name}} {{user.last_name}}</p>
+					</li>
+					<li class="list-group-item">
+						<div class="edit-profile-avatar-div">
+							<img src="{{user.chatprofile.avatar_url}}" alt="Avatar" id="edit-profile-avatar-img">
+						</div>
+					</li>
+					<li class="list-group-item">
+						<p class="subtitle">City</p>
+						{% if user.chatprofile.city %}
+							<p>{{user.chatprofile.city}}</p>
+						{% else %}
+							<p>Not specified</p>
+						{% endif %}
+					</li>
+					<li class="list-group-item">
+						<p class="subtitle">Date of Birth</p>
+						{% if user.chatprofile.birthday %}
+							<p>{{user.chatprofile.birthday}}</p>
+						{% else %}
+							<p>Not specified</p>
+						{% endif %}
+					</li>
+				</ul>	
+			</div>
+		</div>
+    </div>
 {% endblock %}

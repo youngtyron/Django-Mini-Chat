@@ -7,6 +7,9 @@ from datetime import timedelta
 class ChatProfile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	avatar = models.ImageField(upload_to="avatar_images/", null = True, blank = True)
+	birthday = models.DateField(null=True, blank=True)
+	city = models.CharField(null=True, blank=True, max_length=100)
+
 
 
 	def __str__(self):
