@@ -1,3 +1,4 @@
+import datetime
 from urllib.parse import urlparse, urlunparse
 
 from django.conf import settings
@@ -37,6 +38,29 @@ from chat.models import ChatProfile
 
 UserModel = get_user_model()
 
+@login_required
+def update_city(request):
+    if request.method == 'POST' and request.is_ajax:
+        print(request.POST)
+        updated_city = request.POST['city']
+        profile = get_object_or_404(ChatProfile, user = request.user)
+        profile.city = updated_city
+        profile.save()
+        return JsonResponse({'city': profile.city})
+
+@login_required
+def update_birthday(request):
+    if request.method == 'POST' and request.is_ajax:
+        updated_birthday = request.POST['birthday']
+        raw_date = updated_birthday.split('-')
+        year = raw_date[0]
+        month = raw_date[1]
+        day = raw_date[2]
+        date = datetime.date(int(year), int(month), int(day))
+        profile = get_object_or_404(ChatProfile, user = request.user)
+        profile.birthday = date
+        profile.save()
+        return JsonResponse({'birthday': profile.formated_birth_day()})
 
 class DeleteAccountView(View, LoginRequiredMixin):
     def post(self, request):
@@ -53,6 +77,7 @@ class EditProfileView(TemplateView, LoginRequiredMixin):
         context['avatar'] = [self.request.user.chatprofile.avatar_url()]
         context['city'] = self.request.user.chatprofile.city
         context['birthday'] = self.request.user.chatprofile.birthday
+        # context['birthday'] = self.request.user.chatprofile.formated_birth_day()
         context['user'] = self.request.user
         return context
 

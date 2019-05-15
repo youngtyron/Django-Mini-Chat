@@ -21,6 +21,8 @@ urlpatterns = [
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('delete_account/', views.DeleteAccountView.as_view()),
     path('new_avatar/', views.new_avatar),
+    path('update_city/', views.update_city),
+    path('update_birthday/', views.update_birthday),
     path('chat/', include('chat.urls', namespace='chat')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

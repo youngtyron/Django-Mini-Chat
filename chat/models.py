@@ -10,8 +10,6 @@ class ChatProfile(models.Model):
 	birthday = models.DateField(null=True, blank=True)
 	city = models.CharField(null=True, blank=True, max_length=100)
 
-
-
 	def __str__(self):
 		return self.user.username
 
@@ -24,6 +22,14 @@ class ChatProfile(models.Model):
 	def user_dict(self):
 		user_dict = {'id': self.user.id, 'first_name': self.user.first_name, 'last_name': self.user.last_name, 'avatar': self.avatar_url()}
 		return user_dict
+
+	def formated_birth_day(self):
+		# return self.birthday
+		# print(type(self.birthday))
+		# print(self.birthday.year)
+		# print(self.birthday.day)
+		# print(self.birthday.month)
+		return calendar.month_name[self.birthday.month] + ' ' + str(self.birthday.day) + ', ' + str(self.birthday.year)
 
 class Room(models.Model):
 	member = models.ManyToManyField(User)
