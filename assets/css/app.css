@@ -152,9 +152,9 @@
 }
 
 #edit-profile-avatar-img{
-	width: 250px;
-	height: 250px;	
-    border-radius: 50%;
+	width: 200px;
+	height: 200px;
+	border-radius: 50%;
 }
 #avatar-input{
 	opacity: 0;
@@ -168,7 +168,6 @@
 	opacity: 0.3;
 	vertical-align: center;
 }
-
 .modal-add-member-window{
 	border: 1px solid black;
 	top: 0;

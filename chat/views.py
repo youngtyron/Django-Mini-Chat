@@ -102,7 +102,6 @@ def ajax_create_chat(request):
 			room.member.add(member)
 		return JsonResponse({'room_id': room.id})
 
-
 def become_online_chat_announcement(user):
     rooms = Room.objects.filter(member = user)
     user_data = {'online': True, 'id': user.id}

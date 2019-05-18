@@ -2,7 +2,6 @@ import datetime
 from urllib.parse import urlparse, urlunparse
 
 from django.conf import settings
-# Avoid shadowing the login() and logout() views below.
 from django.contrib.auth import (
     REDIRECT_FIELD_NAME, get_user_model, login as auth_login,
     logout as auth_logout, update_session_auth_hash,
@@ -77,7 +76,6 @@ class EditProfileView(TemplateView, LoginRequiredMixin):
         context['avatar'] = [self.request.user.chatprofile.avatar_url()]
         context['city'] = self.request.user.chatprofile.city
         context['birthday'] = self.request.user.chatprofile.birthday
-        # context['birthday'] = self.request.user.chatprofile.formated_birth_day()
         context['user'] = self.request.user
         return context
 
@@ -90,7 +88,7 @@ def new_avatar(request):
         profile.save()
         return JsonResponse({'avatar_url': profile.avatar_url()})
 
-class ProfileView(DetailView):
+class ProfileView(DetailView, LoginRequiredMixin):
     template_name = 'profile.html'
 
     def get_object(self, *kwargs):
@@ -137,9 +135,7 @@ class SuccessURLAllowedHostsMixin:
 
 
 class LoginView(SuccessURLAllowedHostsMixin, FormView):
-    """
-    Display the login form and handle the login action.
-    """
+
     form_class = AuthenticationForm
     authentication_form = None
     redirect_field_name = REDIRECT_FIELD_NAME
@@ -166,7 +162,6 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
         return url or resolve_url(settings.LOGIN_REDIRECT_URL)
 
     def get_redirect_url(self):
-        """Return the user-originating redirect URL if it's safe."""
         redirect_to = self.request.POST.get(
             self.redirect_field_name,
             self.request.GET.get(self.redirect_field_name, '')
@@ -187,7 +182,6 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        """Security check complete. Log the user in."""
         auth_login(self.request, form.get_user())
         cache.add('user_online_' + str(self.request.user.id), True, 999999)
         become_online_chat_announcement(self.request.user)
@@ -206,9 +200,7 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
 
 
 class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
-    """
-    Log out the user and display the 'You are logged out' message.
-    """
+ 
     next_page = None
     redirect_field_name = REDIRECT_FIELD_NAME
     template_name = 'registration/logged_out.html'
@@ -221,12 +213,10 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
         auth_logout(request)
         next_page = self.get_next_page()
         if next_page:
-            # Redirect to this page until the session has been cleared.
             return HttpResponseRedirect(next_page)
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        """Logout may be done via POST."""
         return self.get(request, *args, **kwargs)
 
     def get_next_page(self):
@@ -248,8 +238,6 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
                 allowed_hosts=self.get_success_url_allowed_hosts(),
                 require_https=self.request.is_secure(),
             )
-            # Security check -- Ensure the user-originating redirection URL is
-            # safe.
             if not url_is_safe:
                 next_page = self.request.path
         return next_page
@@ -267,17 +255,11 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
 
 
 def logout_then_login(request, login_url=None):
-    """
-    Log out the user if they are logged in. Then redirect to the login page.
-    """
     login_url = resolve_url(login_url or settings.LOGIN_URL)
     return LogoutView.as_view(next_page=login_url)(request)
 
 
 def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
-    """
-    Redirect the user to the login page, passing the given 'next' page.
-    """
     resolved_url = resolve_url(login_url or settings.LOGIN_URL)
 
     login_url_parts = list(urlparse(resolved_url))
@@ -287,14 +269,6 @@ def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_N
         login_url_parts[4] = querystring.urlencode(safe='/')
 
     return HttpResponseRedirect(urlunparse(login_url_parts))
-
-
-# Class-based password reset views
-# - PasswordResetView sends the mail
-# - PasswordResetDoneView shows a success message for the above
-# - PasswordResetConfirmView checks the link the user clicked and
-#   prompts for a new password
-# - PasswordResetCompleteView shows a success message for the above
 
 class PasswordContextMixin:
     extra_context = None
@@ -370,25 +344,18 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
             if token == INTERNAL_RESET_URL_TOKEN:
                 session_token = self.request.session.get(INTERNAL_RESET_SESSION_TOKEN)
                 if self.token_generator.check_token(self.user, session_token):
-                    # If the token is valid, display the password reset form.
                     self.validlink = True
                     return super().dispatch(*args, **kwargs)
             else:
                 if self.token_generator.check_token(self.user, token):
-                    # Store the token in the session and redirect to the
-                    # password reset form at a URL without the token. That
-                    # avoids the possibility of leaking the token in the
-                    # HTTP Referer header.
                     self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
                     redirect_url = self.request.path.replace(token, INTERNAL_RESET_URL_TOKEN)
                     return HttpResponseRedirect(redirect_url)
 
-        # Display the "Password reset unsuccessful" page.
         return self.render_to_response(self.get_context_data())
 
     def get_user(self, uidb64):
         try:
-            # urlsafe_base64_decode() decodes to bytestring
             uid = urlsafe_base64_decode(uidb64).decode()
             user = UserModel._default_manager.get(pk=uid)
         except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist, ValidationError):
@@ -449,8 +416,6 @@ class PasswordChangeView(PasswordContextMixin, FormView):
 
     def form_valid(self, form):
         form.save()
-        # Updating the password logs out all other sessions for the user
-        # except the current one.
         update_session_auth_hash(self.request, form.user)
         return super().form_valid(form)
 
