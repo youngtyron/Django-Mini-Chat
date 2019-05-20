@@ -1,10 +1,22 @@
 version: '2'
 services:
+    db: 
+        image: postgres
+        # environment:
+        #     POSTGRES_DB: chatbase
+        #     POSTGRES_USER: chatuser
+        #     POSTGRES_PASSWORD: chatpassword
+        # ports:
+        #     - '5432'
     channels: 
         build: .
         command: python3 manage.py runserver 0.0.0.0:8000
+        volumes:
+            - .:/work
         ports: 
             - '8000:8000'
+        depends_on:
+            - db
     redis:
         image: redis
         ports:
