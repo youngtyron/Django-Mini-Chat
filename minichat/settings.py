@@ -67,10 +67,11 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('redis', 6379)],
+            "hosts": [('127.0.0.1', 6379)],
         },
     },
 }
+
 
 CACHES = {
     'default': {
@@ -80,28 +81,25 @@ CACHES = {
 }
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#         'TEST': {
-#             'NAME': os.path.join(BASE_DIR, 'db_test.sqlite3')
-#         }
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        # 'NAME': 'chatbase',
-        # 'USER': 'chatuser',
-        # 'PASSWORD': 'chatpassword',
-        'NAME':'postgres',
-        'USER':'postgres',
-        'HOST':'db',
-        'PORT': 5432,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'TEST': {
+            'NAME': os.path.join(BASE_DIR, 'db_test.sqlite3')
+        }
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME':'postgres',
+#         'USER':'postgres',
+#         'HOST':'db',
+#         'PORT': 5432,
+#     }
+# }
 
 # DATABASES = {
 #     'default': {
@@ -109,7 +107,7 @@ DATABASES = {
 #         'NAME': 'chatbase',
 #         'USER': 'chatuser',
 #         'PASSWORD': 'chatpassword',
-#         'HOST':'0.0.0.0',
+#         'HOST':'127.0.0.1',
 #         'PORT': '',
 #     }
 # }
@@ -146,7 +144,7 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 

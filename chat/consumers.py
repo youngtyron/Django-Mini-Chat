@@ -29,7 +29,7 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
             await self.close()   
 
     async def disconnect(self, close_code):
-         await self.channel_layer.group_discard(
+        await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
@@ -94,20 +94,21 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
     def get_messages_portion(self, counter):
         room = Room.objects.get(id = self.room_id)
         user = self.scope["user"]
-        border = counter + 10
-        messages = room.all_messages()[counter : border]
-        messages_pack = list()
-        for message in messages:
-            this_pack = message.packed_dict(user)
-            messages_pack.append(this_pack)
-        async_to_sync(self.channel_layer.send)(
-            self.channel_name,
-                {
-                    'type': 'load_messages',
-                    'messages_portion': messages_pack,
-                    'counter': border
-                }
-        )
+        if user in room.all_members():
+            border = counter + 10
+            messages = room.all_messages()[counter : border]
+            messages_pack = list()
+            for message in messages:
+                this_pack = message.packed_dict(user)
+                messages_pack.append(this_pack)
+            async_to_sync(self.channel_layer.send)(
+                self.channel_name,
+                    {
+                        'type': 'load_messages',
+                        'messages_portion': messages_pack,
+                        'counter': border
+                    }
+            )
 
     async def load_messages(self, event):
         messages = event['messages_portion']
@@ -193,17 +194,6 @@ class CommonRoomConsumer(AsyncWebsocketConsumer):
             'user_stopped_typing': user_data,
         }))
 
-    async def return_become_online(self, event):
-        user_data = event['user_data']
-        await self.send(text_data=json.dumps({
-            'user_become_online': user_data,
-        }))
-
-    async def return_become_offline(self, event):
-        user_data = event['user_data']
-        await self.send(text_data=json.dumps({
-            'user_become_offline': user_data,
-        }))
 
     @database_sync_to_async
     def add_new_member(self, potential_id):

@@ -10,7 +10,7 @@ application = ProtocolTypeRouter({
 	'websocket': AllowedHostsOriginValidator(
 			AuthMiddlewareStack(
 					URLRouter([
-							url(r'^ws/chat/common/(?P<room_id>[^/]+)/$', CommonRoomConsumer),
+							url(r'^ws/chat/(?P<room_id>[^/]+)/$', CommonRoomConsumer),
 						])
 				)
 		)

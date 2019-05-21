@@ -32,7 +32,6 @@ from django.core.cache import cache
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from .forms import RegistrationForm
-from chat.views import become_online_chat_announcement, become_offline_chat_announcement
 from chat.models import ChatProfile
 
 UserModel = get_user_model()
@@ -183,8 +182,6 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
 
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
-        cache.add('user_online_' + str(self.request.user.id), True, 999999)
-        become_online_chat_announcement(self.request.user)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
@@ -208,8 +205,6 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
 
     @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
-        become_offline_chat_announcement(self.request.user)
-        cache.delete('user_online_' + str(self.request.user.id))
         auth_logout(request)
         next_page = self.get_next_page()
         if next_page:

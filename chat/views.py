@@ -3,7 +3,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.base import TemplateView
 from chat.models import Room, MessageImage
 from django.shortcuts import get_object_or_404, render
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.core.cache import cache
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -18,12 +18,14 @@ class AllRoomsView(TemplateView, LoginRequiredMixin):
 class NewRoomView(TemplateView, LoginRequiredMixin):
 	template_name = 'new_room.html'
 
-class RoomDetailView(DetailView, LoginRequiredMixin):
-	template_name = 'messages_list.html'
 
-	def get_object(self, **kwargs):
-		obj = get_object_or_404(Room, id = self.kwargs['room_id'])
-		return obj
+@login_required
+def room_list(request, room_id):
+	room = get_object_or_404(Room, id = room_id)
+	if request.user in room.all_members():
+		return render(request, 'messages_list.html', {'id': room_id})
+	else:
+		return HttpResponseRedirect('/chat/rooms/')
 
 @login_required
 def ajax_images_sending(request, room_id):
@@ -74,7 +76,6 @@ def ajax_search_users(request):
 	if request.is_ajax:
 		searchText = request.POST['search']
 		matched_users = User.objects.filter(Q(first_name__contains = searchText) | Q (last_name__contains = searchText)).exclude(id = request.user.id)
-		# print(matched_users)
 		users_list = list()
 		for user in matched_users:
 			users_list.append(user.chatprofile.user_dict())
@@ -100,34 +101,5 @@ def ajax_create_chat(request):
 		for one_id in id_list:
 			member = get_object_or_404(User, id = one_id)
 			room.member.add(member)
+		room.member.add(request.user)
 		return JsonResponse({'room_id': room.id})
-
-def become_online_chat_announcement(user):
-    rooms = Room.objects.filter(member = user)
-    user_data = {'online': True, 'id': user.id}
-    channel_layer = get_channel_layer()				
-    for room in rooms:
-        room_group_name = 'chat_%s' % (room.id)
-        async_to_sync(channel_layer.group_send)(
-            room_group_name,
-                {
-                    'type': 'return_become_online',
-                    'user_data': user_data,                  
-                }
-        )
-    return
-
-def become_offline_chat_announcement(user):
-    rooms = Room.objects.filter(member = user)
-    user_data = {'online': False, 'id': user.id}
-    channel_layer = get_channel_layer()				
-    for room in rooms:
-        room_group_name = 'chat_%s' % (room.id)
-        async_to_sync(channel_layer.group_send)(
-            room_group_name,
-                {
-                    'type': 'return_become_offline',
-                    'user_data': user_data,                  
-                }
-        )
-    return 
